@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غابة الطب — لوحة المتصدرين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12211a;
+    --panel: #1b2f24;
+    --panel-alt: #24402f;
+    --text: #efe9d8;
+    --text-dim: #a9bfae;
+    --accent: #e3a83b;
+    --accent-2: #7fb68c;
+    --line: rgba(239, 233, 216, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    min-height: 100%;
+  }
+
+  body {
+    padding: 32px 20px 60px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .site-title {
+    font-family: 'Lalezar', 'Tajawal', sans-serif;
+    font-size: 1.4rem;
+    color: var(--accent-2);
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin: 0 0 4px;
+  }
+
+  .site-sub {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin: 0 0 28px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .hero-number {
+    font-family: 'Lalezar', sans-serif;
+    font-size: 4.2rem;
+    color: var(--accent);
+    line-height: 1;
+    margin: 0;
+  }
+
+  .hero-label {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-top: 6px;
+  }
+
+  .canopy {
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin: 10px 0 30px;
+    opacity: 0.9;
+  }
+
+  .forest-canvas {
+    margin: 26px 0 4px;
+  }
+
+  .forest-canvas svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .tree-label {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 9px;
+    fill: var(--text-dim);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tree-group { animation: grow 0.7s ease-out backwards; }
+  }
+
+  @keyframes grow {
+    from { transform: scaleY(0.4); opacity: 0; }
+    to { transform: scaleY(1); opacity: 1; }
+  }
+
+  .spotlight {
+    text-align: center;
+    color: var(--accent-2);
+    font-size: 0.88rem;
+    margin: 0 0 4px;
+  }
+
+  .tabs, .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .pill {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.9rem;
+    padding: 7px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .pill:hover { border-color: var(--accent-2); color: var(--text); }
+
+  .pill.active {
+    background: var(--panel-alt);
+    border-color: var(--accent-2);
+    color: var(--text);
+  }
+
+  .chips { margin-bottom: 26px; }
+
+  .list {
+    border-top: 1px solid var(--line);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rank-glyph {
+    width: 28px;
+    text-align: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+
+  .rank-num {
+    width: 28px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  .row-name {
+    flex: 1;
+    font-size: 1rem;
+  }
+
+  .row-batch {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-inline-start: 6px;
+  }
+
+  .row-minutes {
+    font-weight: 700;
+    color: var(--accent-2);
+    font-size: 0.98rem;
+    flex-shrink: 0;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--text-dim);
+    padding: 40px 10px;
+    font-size: 0.95rem;
+  }
+
+  .founder-badge {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-inline-start: 4px;
+  }
+
+  .banner {
+    background: var(--panel-alt);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .section {
+    margin-top: 34px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+
+  .section-title {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    margin: 0 0 12px;
+    text-align: center;
+  }
+
+  .hof-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.92rem;
+  }
+
+  .hof-week {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+
+  .war-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .war-name { font-size: 0.95rem; }
+
+  .war-stats {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-align: left;
+  }
+
+  .war-stats b { color: var(--accent-2); }
+
+  .last-place {
+    text-align: center;
+    color: var(--accent);
+    font-size: 0.85rem;
+    margin-top: 14px;
+  }
+
+  .updated {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    margin-top: 30px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-number { animation: rise 0.6s ease-out; }
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="site-title">🌲 غابة الطب</p>
+    <p class="site-sub">منافسة ساعات المذاكرة بين دفعات كلية الطب</p>
+
+    <div class="hero">
+      <p class="hero-number" id="heroNumber">—</p>
+      <p class="hero-label">إجمالي ساعات التركيز الجماعية منذ البداية</p>
+    </div>
+
+    <div class="forest-canvas" id="forestCanvas" aria-label="أعلى المتصدرين هذا الأسبوع، كل شخص شجرة">
+      <svg id="forestSvg" viewBox="0 0 640 180" preserveAspectRatio="xMidYMax meet"></svg>
+    </div>
+
+    <svg class="canopy" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 40 Q 30 10 60 30 T 120 25 T 180 32 T 240 18 T 300 30 T 360 22 T 420 32 T 480 20 T 540 30 T 600 24 V40 Z" fill="#24402f"/>
+      <path d="M0 40 Q 40 25 80 35 T 160 32 T 240 30 T 320 34 T 400 28 T 480 34 T 560 30 T 600 32 V40 Z" fill="#1b2f24"/>
+    </svg>
+
+    <p class="spotlight" id="improvedSpotlight" style="display:none"></p>
+
+    <div class="banner" id="examBanner" style="display:none">
+      📚 وضع الاختبارات مفعّل — الأولوية للمذاكرة، لا للترتيب
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="pill" data-period="daily">اليوم</button>
+      <button class="pill active" data-period="weekly">الأسبوع</button>
+      <button class="pill" data-period="monthly">الشهر</button>
+      <button class="pill" data-period="all_time">كل الوقت</button>
+    </div>
+
+    <div class="chips" id="chips"></div>
+
+    <div class="list" id="list">
+      <p class="empty">جاري التحميل...</p>
+    </div>
+
+    <div class="section" id="batchWarSection" style="display:none">
+      <p class="section-title">⚔️ حرب الدفعات هذا الأسبوع</p>
+      <div id="batchWarList"></div>
+      <p class="last-place" id="lastPlaceNote"></p>
+    </div>
+
+    <div class="section" id="hofSection" style="display:none">
+      <p class="section-title">🏛️ قاعة المشاهير — بطل كل أسبوع</p>
+      <div id="hofList"></div>
+    </div>
+
+    <p class="updated" id="updated"></p>
+  </div>
+
+<script>
+  let DATA = null;
+  let currentPeriod = 'weekly';
+  let currentBatch = 'الكل';
+
+  const rankGlyph = (i) => ['🌲', '🌳', '🌿'][i] || null;
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const mins = Math.round(diffMs / 60000);
+    if (mins < 1) return 'الآن';
+    if (mins < 60) return `منذ ${mins} دقيقة`;
+    const hrs = Math.round(mins / 60);
+    if (hrs < 24) return `منذ ${hrs} ساعة`;
+    const days = Math.round(hrs / 24);
+    return `منذ ${days} يوم`;
+  }
+
+  function renderForest() {
+    const rows = (DATA.weekly || []).slice(0, 8);
+    const svg = document.getElementById('forestSvg');
+    if (!rows.length) {
+      document.getElementById('forestCanvas').style.display = 'none';
+      return;
+    }
+    document.getElementById('forestCanvas').style.display = 'block';
+    const maxMinutes = Math.max(...rows.map(r => r.minutes), 1);
+    const slotW = 640 / rows.length;
+    const baseline = 165;
+    const colors = ['#e3a83b', '#a3c9a8', '#7fb68c', '#5f9273'];
+
+    let svgContent = '';
+    rows.forEach((r, i) => {
+      const scale = 0.45 + 0.55 * (r.minutes / maxMinutes); // never fully flat
+      const h = 110 * scale;
+      const trunkH = 18 * scale;
+      const cx = slotW * i + slotW / 2;
+      const canopyR = 22 * scale;
+      const color = colors[i % colors.length];
+      const delay = (i * 0.07).toFixed(2);
+
+      svgContent += `
+        <g class="tree-group" style="animation-delay:${delay}s; transform-origin: ${cx}px ${baseline}px;">
+          <rect x="${cx - 3}" y="${baseline - trunkH}" width="6" height="${trunkH}" rx="2" fill="#5c4632"/>
+          <circle cx="${cx}" cy="${baseline - trunkH - canopyR * 0.7}" r="${canopyR}" fill="${color}" opacity="0.95"/>
+          <circle cx="${cx - canopyR * 0.5}" cy="${baseline - trunkH - canopyR * 0.3}" r="${canopyR * 0.7}" fill="${color}" opacity="0.85"/>
+          <circle cx="${cx + canopyR * 0.5}" cy="${baseline - trunkH - canopyR * 0.3}" r="${canopyR * 0.7}" fill="${color}" opacity="0.85"/>
+          <text x="${cx}" y="${baseline + 14}" text-anchor="middle" class="tree-label">${r.name.length > 8 ? r.name.slice(0, 7) + '…' : r.name}</text>
+        </g>
+      `;
+    });
+    svg.innerHTML = svgContent;
+  }
+
+  function renderSpotlight() {
+    const el = document.getElementById('improvedSpotlight');
+    const mi = DATA.most_improved;
+    if (mi && mi.name && mi.delta > 0) {
+      el.style.display = 'block';
+      el.textContent = `📈 الأكثر تحسنًا هذا الأسبوع: ${mi.name} (+${mi.delta} دقيقة)`;
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  function render() {
+    if (!DATA) return;
+    renderForest();
+    renderSpotlight();
+
+    let rows;
+    if (currentBatch === 'الكل') {
+      rows = DATA[currentPeriod] || [];
+    } else {
+      rows = currentPeriod === 'weekly'
+        ? (DATA.weekly_by_batch && DATA.weekly_by_batch[currentBatch]) || []
+        : (rows = (DATA[currentPeriod] || []).filter(r => r.batch === currentBatch));
+    }
+
+    const listEl = document.getElementById('list');
+    if (!rows.length) {
+      listEl.innerHTML = '<p class="empty">لا توجد جلسات مسجّلة لهذه الفترة بعد.</p>';
+    } else {
+      listEl.innerHTML = rows.map((r, i) => `
+        <div class="row">
+          ${rankGlyph(i) ? `<span class="rank-glyph">${rankGlyph(i)}</span>` : `<span class="rank-num">${i + 1}</span>`}
+          <span class="row-name">${r.name}${r.founder ? '<span class="founder-badge">🏅 مؤسس</span>' : ''}${r.batch ? `<span class="row-batch">${r.batch}</span>` : ''}</span>
+          <span class="row-minutes">${r.minutes} د</span>
+        </div>
+      `).join('');
+    }
+
+    const totalAllTime = (DATA.all_time || []).reduce((s, r) => s + r.minutes, 0);
+    document.getElementById('heroNumber').textContent = Math.round(totalAllTime / 60).toLocaleString('en-US');
+    document.getElementById('updated').textContent = DATA.generated_at ? `آخر تحديث: ${timeAgo(DATA.generated_at)}` : '';
+
+    document.getElementById('examBanner').style.display = DATA.exam_mode ? 'block' : 'none';
+
+    const warSection = document.getElementById('batchWarSection');
+    const totals = DATA.weekly_batch_totals || {};
+    const averages = DATA.weekly_batch_averages || {};
+    const batchNames = Object.keys(totals);
+    if (batchNames.length > 1) {
+      warSection.style.display = 'block';
+      const ranked = batchNames.sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
+      document.getElementById('batchWarList').innerHTML = ranked.map(b => `
+        <div class="war-row">
+          <span class="war-name">${b}</span>
+          <span class="war-stats"><b>${totals[b] || 0} د</b> إجمالي — ${averages[b] || 0} د/فرد</span>
+        </div>
+      `).join('');
+      const lastBatch = ranked[ranked.length - 1];
+      document.getElementById('lastPlaceNote').textContent =
+        `⚠️ ${lastBatch} في آخر الترتيب — وقت تجيبون أصحابكم!`;
+    } else {
+      warSection.style.display = 'none';
+    }
+
+    const hofSection = document.getElementById('hofSection');
+    const hof = DATA.hall_of_fame || [];
+    if (hof.length) {
+      hofSection.style.display = 'block';
+      document.getElementById('hofList').innerHTML = hof.map(h => `
+        <div class="hof-row">
+          <span>🌲 ${h.name}${h.batch ? ` [${h.batch}]` : ''}</span>
+          <span class="hof-week">${h.week_start} — ${h.minutes} د</span>
+        </div>
+      `).join('');
+    } else {
+      hofSection.style.display = 'none';
+    }
+  }
+
+  function renderChips() {
+    const batches = Object.keys(DATA.weekly_by_batch || {});
+    const chipsEl = document.getElementById('chips');
+    const all = ['الكل', ...batches];
+    chipsEl.innerHTML = all.map(b =>
+      `<button class="pill${b === currentBatch ? ' active' : ''}" data-batch="${b}">${b}</button>`
+    ).join('');
+    chipsEl.querySelectorAll('.pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentBatch = btn.dataset.batch;
+        renderChips();
+        render();
+      });
+    });
+  }
+
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.pill');
+    if (!btn) return;
+    document.querySelectorAll('#tabs .pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    currentPeriod = btn.dataset.period;
+    render();
+  });
+
+  fetch('./data.json?_=' + Date.now())
+    .then(r => r.json())
+    .then(json => {
+      DATA = json;
+      renderChips();
+      render();
+    })
+    .catch(() => {
+      document.getElementById('list').innerHTML =
+        '<p class="empty">تعذّر تحميل البيانات — تأكد أن البوت يعمل ويحدّث data.json</p>';
+    });
+</script>
+</body>
+</html>

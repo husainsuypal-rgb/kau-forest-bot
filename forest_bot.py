@@ -41,6 +41,13 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
+try:
+    import websockets
+
+    WEBSOCKETS_AVAILABLE = True
+except ImportError:
+    WEBSOCKETS_AVAILABLE = False
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -85,11 +92,36 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO", "")  # e.g. "yourname/study-leaderbo
 GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 GITHUB_DATA_PATH = os.environ.get("GITHUB_DATA_PATH", "data.json")
 
+# Official launch date (YYYY-MM-DD). Before this date, logging is blocked
+# entirely — registration still works (early joiners still get founder
+# badges), but no minutes can be claimed. This exists specifically so no
+# one can screenshot old Forest history from before the competition
+# existed and backdate it in. Leave unset to disable the gate (logging
+# always allowed) — useful while testing before you've picked a date.
+LAUNCH_DATE = os.environ.get("LAUNCH_DATE", "")  # e.g. "2026-10-05"
+
+
+def is_before_launch() -> bool:
+    if not LAUNCH_DATE:
+        return False
+    try:
+        return local_today() < date.fromisoformat(LAUNCH_DATE)
+    except ValueError:
+        return False
+
 # Timezone offset from UTC in hours, for scheduling posts at local time.
 # Saudi Arabia is UTC+3. Change this if your group is elsewhere.
 TZ_OFFSET_HOURS = int(os.environ.get("TZ_OFFSET_HOURS", "3"))
 
 MILESTONES_MINUTES = [600, 1500, 3000, 6000]  # 10h, 25h, 50h, 100h
+STREAK_MILESTONES = [3, 7, 14, 30, 60]
+STREAK_LABELS = {
+    3: "🔥 3 أيام متتالية — بداية موفقة!",
+    7: "🔥🔥 أسبوع كامل بدون انقطاع!",
+    14: "🔥🔥 أسبوعين متتاليين — التزام حقيقي!",
+    30: "🔥🔥🔥 شهر كامل من الاستمرارية — أسطوري!",
+    60: "🔥🔥🔥 شهرين متتاليين — ما في وصف لهذا!",
+}
 MILESTONE_LABELS = {
     600: "🌱 10 ساعات تركيز — أول علامة فارقة!",
     1500: "🌿 25 ساعة تركيز — استمرار رائع!",
@@ -97,13 +129,43 @@ MILESTONE_LABELS = {
     6000: "🌲 100 ساعة تركيز — أسطورة الغابة!",
 }
 
-TIER_THRESHOLDS = [
-    (0, "🌰 بذرة"),
-    (300, "🌱 شتلة"),      # 5h+
-    (1500, "🌿 شجرة صغيرة"),  # 25h+
-    (3000, "🌳 شجرة"),     # 50h+
-    (6000, "🌲 غابة"),     # 100h+
+# Level system — grows with the square root of all-time hours (fast early
+# wins, naturally slower later, same shape as most XP curves). Titles are
+# our own forest-growth naming, deliberately NOT a "Med Student / Clerk /
+# Resident" copy of any other app's leaderboard wording — this one's ours.
+LEVEL_TITLES = [
+    (1, "🥉 برونزي"),
+    (4, "🥈 فضي"),
+    (8, "🥇 ذهبي"),
+    (13, "💎 ماسي"),
+    (19, "👑 أسطوري"),
 ]
+
+# Bonus XP per day of an ongoing streak — rewards consistency, not just
+# raw volume in one sitting (same idea as "streak bonuses included" on
+# any XP-leaderboard app).
+STREAK_XP_PER_DAY = 3
+
+
+def level_for_total(total_minutes: int) -> int:
+    hours = total_minutes / 60
+    return 1 + int(hours ** 0.5)
+
+
+def level_title_for(level: int) -> str:
+    title = LEVEL_TITLES[0][1]
+    for threshold, name in LEVEL_TITLES:
+        if level >= threshold:
+            title = name
+    return title
+
+
+def minutes_for_next_level(total_minutes: int) -> int:
+    """Minutes still needed to reach the next level, for a 'so close!' nudge."""
+    current_level = level_for_total(total_minutes)
+    next_hours_needed = current_level ** 2  # inverse of the sqrt curve
+    next_minutes_needed = next_hours_needed * 60
+    return max(0, next_minutes_needed - total_minutes)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -149,6 +211,24 @@ def init_db():
             user_id INTEGER NOT NULL,
             milestone INTEGER NOT NULL,
             PRIMARY KEY (user_id, milestone)
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS streak_milestones_hit (
+            user_id INTEGER NOT NULL,
+            milestone INTEGER NOT NULL,
+            PRIMARY KEY (user_id, milestone)
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS levels_hit (
+            user_id INTEGER NOT NULL,
+            level INTEGER NOT NULL,
+            PRIMARY KEY (user_id, level)
         )
         """
     )
@@ -316,20 +396,25 @@ def log_session(user_id: int, username: str, minutes: int, tag: str | None):
     conn.close()
 
 
-def log_daily_card(user_id: int, username: str, minutes: int):
+def log_daily_card(user_id: int, username: str, minutes: int, session_date: date | None = None):
     """A Forest 'Focus Statistics' daily-total screenshot. Replaces (never
-    adds to) any earlier daily_card for the same user+day, since it's
-    already a cumulative total for that day, not one more session."""
-    today_str = local_today().isoformat()
+    adds to) any earlier daily_card for the SAME user+day, since it's
+    already a cumulative total for that day, not one more session.
+
+    session_date defaults to today, but can be any past date — this is
+    what makes catch-up logging possible: someone can grind all day, then
+    send yesterday's (or any earlier day's) card at the end. Re-sending
+    the same day's card later just revises that day; it never adds twice."""
+    day_str = (session_date or local_today()).isoformat()
     conn = db()
     conn.execute(
         "DELETE FROM sessions WHERE user_id=? AND session_date=? AND source='daily_card'",
-        (user_id, today_str),
+        (user_id, day_str),
     )
     conn.execute(
         "INSERT INTO sessions (user_id, username, minutes, tag, logged_at, session_date, source) "
         "VALUES (?, ?, ?, NULL, ?, ?, 'daily_card')",
-        (user_id, username, minutes, datetime.utcnow().isoformat(), today_str),
+        (user_id, username, minutes, datetime.utcnow().isoformat(), day_str),
     )
     conn.commit()
     conn.close()
@@ -436,7 +521,7 @@ def most_improved(this_week_start: date, last_week_start: date):
     names = {
         r["user_id"]: r["name"]
         for r in conn.execute(
-            "SELECT user_id, COALESCE(u.display_name, s.username) AS name "
+            "SELECT s.user_id AS user_id, COALESCE(u.display_name, s.username) AS name "
             "FROM sessions s LEFT JOIN users u ON u.user_id = s.user_id "
             "WHERE s.session_date >= ? GROUP BY s.user_id",
             (last_week_start.isoformat(),),
@@ -467,12 +552,63 @@ def current_streak(user_id: int) -> int:
     return streak
 
 
-def tier_for(minutes: int) -> str:
-    label = TIER_THRESHOLDS[0][1]
-    for threshold, name in TIER_THRESHOLDS:
-        if minutes >= threshold:
-            label = name
-    return label
+def get_top_streaks(limit: int = 8):
+    """Top current streaks across all registered users. O(n) over the
+    user list — fine at this scale, revisit if it ever gets huge."""
+    conn = db()
+    users = conn.execute("SELECT user_id, display_name, batch FROM users").fetchall()
+    conn.close()
+    results = []
+    for u in users:
+        s = current_streak(u["user_id"])
+        if s > 0:
+            results.append({"name": u["display_name"], "batch": u["batch"], "streak": s})
+    results.sort(key=lambda r: r["streak"], reverse=True)
+    return results[:limit]
+
+
+async def check_and_announce_streak_milestones(update, context, user):
+    streak = current_streak(user.id)
+    conn = db()
+    for m in STREAK_MILESTONES:
+        if streak >= m:
+            already = conn.execute(
+                "SELECT 1 FROM streak_milestones_hit WHERE user_id=? AND milestone=?",
+                (user.id, m),
+            ).fetchone()
+            if not already:
+                conn.execute(
+                    "INSERT INTO streak_milestones_hit (user_id, milestone) VALUES (?, ?)",
+                    (user.id, m),
+                )
+                conn.commit()
+                if GROUP_CHAT_ID:
+                    await context.bot.send_message(
+                        chat_id=GROUP_CHAT_ID,
+                        text=f"{STREAK_LABELS[m]}\n{user.first_name} مستمر بدون انقطاع!",
+                    )
+    conn.close()
+
+
+async def check_and_announce_level_up(update, context, user):
+    total = total_minutes(user.id)
+    level = level_for_total(total)
+    if level <= 1:
+        return
+    conn = db()
+    already = conn.execute(
+        "SELECT 1 FROM levels_hit WHERE user_id=? AND level=?", (user.id, level)
+    ).fetchone()
+    if not already:
+        conn.execute("INSERT INTO levels_hit (user_id, level) VALUES (?, ?)", (user.id, level))
+        conn.commit()
+        title = level_title_for(level)
+        if GROUP_CHAT_ID:
+            await context.bot.send_message(
+                chat_id=GROUP_CHAT_ID,
+                text=f"⭐ ترقية! {user.first_name} صار بالمستوى {level} — {title}",
+            )
+    conn.close()
 
 
 def _rows_to_list(rows):
@@ -483,11 +619,17 @@ def _rows_to_list(rows):
             "SELECT founder FROM users WHERE user_id=?", (r["user_id"],)
         ).fetchone()
         conn.close()
+        all_time = total_minutes(r["user_id"])  # level reflects career-to-date, not just this period
+        level = level_for_total(all_time)
+        streak_bonus = current_streak(r["user_id"]) * STREAK_XP_PER_DAY
         out.append({
             "name": r["name"],
             "batch": r["batch"] or None,
             "minutes": r["total"],
             "founder": bool(founder_row and founder_row["founder"]),
+            "level": level,
+            "level_title": level_title_for(level),
+            "xp": r["total"] + streak_bonus,
         })
     return out
 
@@ -555,7 +697,61 @@ def build_export_data() -> dict:
         "weekly_batch_totals": batch_totals(week_start),
         "hall_of_fame": hall_of_fame,
         "most_improved": {"name": improved_name, "delta": improved_delta} if improved_name else None,
+        "top_streaks": get_top_streaks(limit=8),
     }
+
+
+CONNECTED_CLIENTS: set = set()
+
+
+async def broadcast_update():
+    """Pushes the current leaderboard to every browser tab with the site
+    open, over the WebSocket server started in main(). This is what makes
+    the site update live instead of only on page refresh. Safe to call
+    even if no server is running / no clients are connected."""
+    if not CONNECTED_CLIENTS:
+        return
+    try:
+        payload = json.dumps(build_export_data(), ensure_ascii=False)
+    except Exception:
+        logger.exception("Failed to build export data for broadcast")
+        return
+    dead = set()
+    for ws in CONNECTED_CLIENTS:
+        try:
+            await ws.send(payload)
+        except Exception:
+            dead.add(ws)
+    CONNECTED_CLIENTS.difference_update(dead)
+
+
+async def ws_handler(websocket):
+    """One entry per connected browser tab. Sends the current leaderboard
+    immediately on connect, then just keeps the socket open — all further
+    updates come from broadcast_update() being called elsewhere whenever
+    someone logs a session."""
+    CONNECTED_CLIENTS.add(websocket)
+    try:
+        payload = json.dumps(build_export_data(), ensure_ascii=False)
+        await websocket.send(payload)
+        async for _ in websocket:
+            pass  # the site never sends us anything; just keep the connection open
+    except Exception:
+        pass
+    finally:
+        CONNECTED_CLIENTS.discard(websocket)
+
+
+async def start_ws_server(app):
+    """Runs the live-update WebSocket server on Railway's assigned $PORT,
+    alongside the bot's own polling loop, for as long as the app runs."""
+    if not WEBSOCKETS_AVAILABLE:
+        logger.warning("websockets package not installed — live updates disabled")
+        return
+    port = int(os.environ.get("PORT", 8765))
+    server = await websockets.serve(ws_handler, "0.0.0.0", port)
+    app.bot_data["ws_server"] = server
+    logger.info(f"Live-update WebSocket server listening on 0.0.0.0:{port}")
 
 
 def push_leaderboard_to_github():
@@ -615,6 +811,16 @@ def daily_total_all() -> int:
 # ---------------------------------------------------------------------------
 
 
+def default_display_name(user) -> str:
+    """Leaderboards show Telegram @usernames, not real names — a deliberate
+    privacy/tone choice, not a fallback. Only when someone has no public
+    Telegram username do we fall back to their Telegram first name, and
+    even then /setname lets them pick a handle-style name instead."""
+    if user.username:
+        return f"@{user.username}"
+    return user.first_name
+
+
 async def cmd_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/register Med25"""
     args = context.args
@@ -626,30 +832,38 @@ async def cmd_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     batch = args[0]
-    is_founder = register_user(user.id, user.full_name, batch)
+    is_founder = register_user(user.id, default_display_name(user), batch)
     founder_line = (
         f"\n🏅 أنت من أوائل المؤسسين في {batch} — راح يظهر وسمك دايمًا!"
         if is_founder
         else ""
     )
+    name_note = (
+        ""
+        if user.username
+        else "\nℹ️ ما عندك يوزرنيم بتيليجرام، فراح يظهر اسمك الأول فقط. "
+        "تقدر تغيّره بالأمر: /setname"
+    )
     await update.message.reply_text(
         f"✅ تم تسجيلك يا {user.first_name} ضمن دفعة {batch}!{founder_line}\n"
-        "تقدر تغيّر اسمك الظاهر بالأمر: /setname الاسم"
+        f"بالمتصدرين راح يظهر يوزرنيمك ({default_display_name(user)}) مو اسمك الكامل.{name_note}"
     )
 
 
 async def cmd_setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Overrides the leaderboard name — mainly for people with no Telegram
+    @username, or who want a different handle shown than their real one."""
     args = context.args
     user = update.effective_user
     if not get_user(user.id):
         await update.message.reply_text("سجّل نفسك أولًا بالأمر: /register Med25")
         return
     if not args:
-        await update.message.reply_text("استخدم: /setname الاسم الي تبيه يظهر")
+        await update.message.reply_text("استخدم: /setname اليوزرنيم أو اللقب الي تبيه يظهر بالمتصدرين")
         return
     name = " ".join(args)
     set_display_name(user.id, name)
-    await update.message.reply_text(f"✅ تم تحديث اسمك إلى: {name}")
+    await update.message.reply_text(f"✅ تم تحديث اسمك بالمتصدرين إلى: {name}")
 
 
 async def cmd_setschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -754,6 +968,7 @@ async def cmd_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     log_session(target.id, target.username or target.full_name, minutes, "manager-correction")
     push_leaderboard_to_github()
+    await broadcast_update()
     await update.message.reply_text(
         f"✅ تم تسجيل {minutes} دقيقة يدويًا لـ {target.first_name} (تصحيح من المنظم)."
     )
@@ -763,11 +978,17 @@ async def cmd_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     total = total_minutes(user.id)
     streak = current_streak(user.id)
+    level = level_for_total(total)
+    title = level_title_for(level)
+    remaining = minutes_for_next_level(total)
+    xp = total + streak * STREAK_XP_PER_DAY
     await update.message.reply_text(
         f"📊 إحصائياتك يا {user.first_name}:\n"
-        f"— الإجمالي: {total} دقيقة ({total // 60} ساعة)\n"
-        f"— الرتبة: {tier_for(total)}\n"
-        f"— التتابع الحالي: {streak} يوم"
+        f"— المستوى {level} · {title}\n"
+        f"— الإجمالي: {total} دقيقة ({total // 60} ساعة) — {xp} XP\n"
+
+        f"— التتابع الحالي: {streak} يوم\n"
+        f"— باقي {remaining} دقيقة للمستوى {level + 1}!"
     )
 
 
@@ -871,21 +1092,21 @@ def extract_daily_card_minutes(text: str) -> int | None:
     return None
 
 
-def check_card_date(text: str, today: date) -> str:
-    """Strong check for the daily card, which stamps an explicit MM.DD YYYY
-    date — unlike the Timeline heuristic below, a mismatch here is precise
-    enough to hard-block on."""
+def extract_card_date(text: str) -> date | None:
+    """Parses the daily card's stamped MM.DD YYYY date. Unlike the Timeline
+    heuristic below, this is precise enough to use as the actual
+    session_date — which is what makes retroactive catch-up logging safe:
+    the card names its own day, so the bot never has to assume 'today'."""
     import re
 
     m = re.search(r"(\d{2})\.(\d{2})\s*(20\d{2})", text)
     if not m:
-        return "unknown"
+        return None
     month, day, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
     try:
-        found = date(year, month, day)
+        return date(year, month, day)
     except ValueError:
-        return "unknown"
-    return "match" if found == today else "mismatch"
+        return None
 
 
 def check_screenshot_date(text: str, today: date) -> str:
@@ -910,11 +1131,20 @@ def check_screenshot_date(text: str, today: date) -> str:
 
 async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Downloads the photo, runs OCR + anti-cheat checks, and returns
-    (minutes, image_hash, source) on success — source is 'daily_card' for
-    Forest's Focus Statistics screen (date-stamped, one per day, replaces
-    the day's total) or 'session' for a single Timeline entry (adds to the
-    day's total). Sends an error reply and returns None on failure."""
+    (minutes, image_hash, source, session_date) on success — source is
+    'daily_card' for Forest's Focus Statistics screen (date-stamped, one
+    per day, replaces that day's total — can be a PAST day, which is how
+    catch-up logging works) or 'session' for a single Timeline entry
+    (always logged under today). Sends an error reply and returns None on
+    failure."""
     import hashlib
+
+    if is_before_launch():
+        await update.message.reply_text(
+            f"📚 التسجيل الرسمي يبدأ {LAUNCH_DATE} — سجّل دفعتك الحين لأخذ وسم المؤسس 🏅، "
+            "وارجع تصوّر جلساتك من يوم الإطلاق."
+        )
+        return None
 
     if not OCR_AVAILABLE:
         await update.message.reply_text(
@@ -943,6 +1173,8 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("ما قدرت أقرأ الصورة، صوّر شاشة أوضح وجرّب ثانية.")
         return None
 
+    today = local_today()
+
     if is_daily_card_screenshot(text):
         minutes = extract_daily_card_minutes(text)
         if minutes is None:
@@ -950,13 +1182,23 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "لقيت بطاقة الإحصائيات اليومية بس ما قدرت أقرأ الوقت الإجمالي بوضوح."
             )
             return None
-        date_status = check_card_date(text, local_today())
-        if date_status == "mismatch":
+
+        card_date = extract_card_date(text)
+        if card_date is None:
             await update.message.reply_text(
-                "⚠️ تاريخ البطاقة مو تاريخ اليوم. ابعث بطاقة اليوم (Overview → day)."
+                "ما قدرت أقرأ تاريخ البطاقة بوضوح. تأكد إن التاريخ أعلى البطاقة ظاهر بالصورة."
             )
             return None
-        return minutes, image_hash, "daily_card"
+        if card_date > today:
+            await update.message.reply_text("⚠️ هذا تاريخ بالمستقبل! تأكد إنك صوّرت اليوم الصحيح.")
+            return None
+        if LAUNCH_DATE and card_date < date.fromisoformat(LAUNCH_DATE):
+            await update.message.reply_text(
+                f"⚠️ هذا التاريخ قبل بداية المسابقة الرسمية ({LAUNCH_DATE}) — ما يُحتسب."
+            )
+            return None
+
+        return minutes, image_hash, "daily_card", card_date
 
     minutes = extract_minutes_from_ocr(text)
     if minutes is None:
@@ -965,14 +1207,15 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return None
 
-    date_status = check_screenshot_date(text, local_today())
+    date_status = check_screenshot_date(text, today)
     if date_status == "mismatch":
         await update.message.reply_text(
-            "⚠️ يبدو إن تاريخ الصورة مو تاريخ اليوم. صوّر جلسة اليوم وابعثها من جديد."
+            "⚠️ يبدو إن تاريخ الصورة مو تاريخ اليوم. جلسات Timeline تُسجَّل لليوم الحالي فقط — "
+            "لو تبي تسجّل يوم فات، استخدم بطاقة ذاك اليوم من Overview بدالها."
         )
         return None
 
-    return minutes, image_hash, "session"
+    return minutes, image_hash, "session", None
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -980,19 +1223,23 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     result = await _ocr_and_prepare(update, context)
     if result is None:
         return
-    minutes, image_hash, source = result
-    kind_label = "📊 بطاقة اليوم الكاملة" if source == "daily_card" else "📸 جلسة واحدة"
+    minutes, image_hash, source, session_date = result
+    kind_label = "📊 بطاقة يوم" if source == "daily_card" else "📸 جلسة واحدة"
+    day_note = ""
+    if source == "daily_card" and session_date != local_today():
+        day_note = f" (ليوم {session_date.isoformat()})"
 
     if not get_user(user.id):
         # Auto-registration: hold the OCR'd data and ask which batch they're in.
         context.user_data["pending_minutes"] = minutes
         context.user_data["pending_hash"] = image_hash
         context.user_data["pending_source"] = source
+        context.user_data["pending_date"] = session_date.isoformat() if session_date else None
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(b, callback_data=f"regbatch:{b}")] for b in VALID_BATCHES]
         )
         await update.message.reply_text(
-            f"{kind_label} — وجدت {minutes} دقيقة 👍\nقبل لا نسجّلها، وش دفعتك؟",
+            f"{kind_label}{day_note} — وجدت {minutes} دقيقة 👍\nقبل لا نسجّلها، وش دفعتك؟",
             reply_markup=keyboard,
         )
         return
@@ -1000,6 +1247,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["pending_minutes"] = minutes
     context.user_data["pending_hash"] = image_hash
     context.user_data["pending_source"] = source
+    context.user_data["pending_date"] = session_date.isoformat() if session_date else None
     keyboard = InlineKeyboardMarkup(
         [
             [
@@ -1009,28 +1257,33 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     )
     note = (
-        "\n(بطاقة اليوم تحل محل أي جلسات سجّلتها اليوم، مو تضاف عليها)"
+        "\n(بطاقة اليوم تحل محل أي جلسات سجّلتها لنفس اليوم، مو تضاف عليها)"
         if source == "daily_card"
         else ""
     )
     await update.message.reply_text(
-        f"{kind_label} — وجدت {minutes} دقيقة — تأكيد؟{note}", reply_markup=keyboard
+        f"{kind_label}{day_note} — وجدت {minutes} دقيقة — تأكيد؟{note}", reply_markup=keyboard
     )
 
 
-async def _finalize_log(update, context, user, minutes: int, image_hash: str | None, source: str):
+async def _finalize_log(
+    update, context, user, minutes: int, image_hash: str | None, source: str, session_date: date | None
+):
     if source == "daily_card":
-        log_daily_card(user.id, user.username or user.full_name, minutes)
+        log_daily_card(user.id, user.username or user.full_name, minutes, session_date)
     else:
         log_session(user.id, user.username or user.full_name, minutes, None)
     if image_hash:
         mark_screenshot_used(image_hash, user.id)
     await check_and_announce_milestones(update, context, user)
+    await check_and_announce_streak_milestones(update, context, user)
+    await check_and_announce_level_up(update, context, user)
     push_leaderboard_to_github()
+    await broadcast_update()
     total = total_minutes(user.id)
     streak = current_streak(user.id)
     await update.callback_query.edit_message_text(
-        f"✅ تم تسجيل {minutes} دقيقة! إجمالي رصيدك: {total} دقيقة ({tier_for(total)}) — 🔥 {streak} يوم متتالي"
+        f"✅ تم تسجيل {minutes} دقيقة! إجمالي رصيدك: {total} دقيقة (Lv{level_for_total(total)} · {level_title_for(level_for_total(total))}) — 🔥 {streak} يوم متتالي"
     )
 
 
@@ -1041,7 +1294,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data.startswith("regbatch:"):
         batch = query.data.split(":", 1)[1]
-        is_founder = register_user(user.id, user.full_name, batch)
+        is_founder = register_user(user.id, default_display_name(user), batch)
         minutes = context.user_data.get("pending_minutes")
         source = context.user_data.get("pending_source", "session")
         founder_line = f" 🏅 وأنت من أوائل مؤسسي {batch}!" if is_founder else ""
@@ -1068,13 +1321,16 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _, source, minutes_str = query.data.split(":", 2)
         minutes = int(minutes_str)
         image_hash = context.user_data.get("pending_hash")
+        date_str = context.user_data.get("pending_date")
+        session_date = date.fromisoformat(date_str) if date_str else None
         if image_hash and is_screenshot_used(image_hash):
             await query.edit_message_text("⚠️ هذي الصورة اتسجّلت بالفعل.")
             return
-        await _finalize_log(update, context, user, minutes, image_hash, source)
+        await _finalize_log(update, context, user, minutes, image_hash, source, session_date)
         context.user_data.pop("pending_minutes", None)
         context.user_data.pop("pending_hash", None)
         context.user_data.pop("pending_source", None)
+        context.user_data.pop("pending_date", None)
 
     elif query.data == "edit":
         await query.edit_message_text(
@@ -1083,6 +1339,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.pop("pending_minutes", None)
         context.user_data.pop("pending_hash", None)
         context.user_data.pop("pending_source", None)
+        context.user_data.pop("pending_date", None)
 
 
 # ---------------------------------------------------------------------------
@@ -1093,6 +1350,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def job_sync_website(context: ContextTypes.DEFAULT_TYPE):
     """Fallback safety-net sync, in case a per-log push ever fails silently."""
     push_leaderboard_to_github()
+    await broadcast_update()
 
 
 async def job_daily_summary(context: ContextTypes.DEFAULT_TYPE):
@@ -1203,7 +1461,10 @@ def main():
 
     init_db()
 
-    app = Application.builder().token(BOT_TOKEN).build()
+    async def post_init(app: Application):
+        await start_ws_server(app)
+
+    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
 
     app.add_handler(CommandHandler("register", cmd_register))
     app.add_handler(CommandHandler("setname", cmd_setname))

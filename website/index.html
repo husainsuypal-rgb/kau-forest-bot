@@ -9,14 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #12211a;
-    --panel: #1b2f24;
-    --panel-alt: #24402f;
-    --text: #efe9d8;
-    --text-dim: #a9bfae;
-    --accent: #e3a83b;
-    --accent-2: #7fb68c;
-    --line: rgba(239, 233, 216, 0.12);
+    --bg: #143550;
+    --panel: #1d4763;
+    --panel-alt: #285d80;
+    --text: #fffaf0;
+    --text-dim: #c3ddf0;
+    --accent: #ffc65c;
+    --accent-glow: rgba(255, 198, 92, 0.55);
+    --accent-2: #3eeeb8;
+    --accent-3: #6cc0ff;
+    --accent-3-glow: rgba(108, 192, 255, 0.5);
+    --line: rgba(255, 250, 240, 0.16);
   }
 
   * { box-sizing: border-box; }
@@ -33,27 +36,93 @@
   body {
     padding: 32px 20px 60px;
     font-variant-numeric: tabular-nums;
+    position: relative;
+    overflow-x: hidden;
+    background:
+      radial-gradient(ellipse 65% 45% at 15% 0%, rgba(255,198,92,0.22), transparent 62%),
+      radial-gradient(ellipse 80% 55% at 95% 8%, rgba(108,192,255,0.24), transparent 64%),
+      radial-gradient(ellipse 85% 55% at 50% 100%, rgba(62,238,184,0.18), transparent 66%),
+      var(--bg);
+  }
+
+  .fireflies {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .firefly {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px 2px var(--accent-glow);
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .firefly { animation: drift 9s ease-in-out infinite; }
+  }
+
+  @keyframes drift {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    15% { opacity: 0.9; }
+    50% { transform: translateY(-40px) translateX(10px); opacity: 0.5; }
+    85% { opacity: 0.8; }
+    100% { transform: translateY(-90px) translateX(-6px); opacity: 0; }
   }
 
   .wrap {
     max-width: 640px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .leader-banner {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--accent);
+    background: linear-gradient(135deg, rgba(255,198,92,0.14), rgba(108,192,255,0.10));
+    border: 1px solid rgba(255,198,92,0.3);
+    border-radius: 999px;
+    padding: 6px 16px;
+    display: block;
+    margin: 0 auto 22px;
+    width: fit-content;
+  }
+
+  .kicker {
+    text-align: center;
+    color: var(--accent-3);
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+    opacity: 0.85;
   }
 
   .site-title {
     font-family: 'Lalezar', 'Tajawal', sans-serif;
-    font-size: 1.4rem;
-    color: var(--accent-2);
+    font-size: 2.1rem;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent) 55%, var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     text-align: center;
     letter-spacing: 0.5px;
-    margin: 0 0 4px;
+    margin: 0 0 6px;
+    line-height: 1.15;
   }
 
   .site-sub {
     text-align: center;
     color: var(--text-dim);
-    font-size: 0.85rem;
-    margin: 0 0 28px;
+    font-size: 0.88rem;
+    margin: 0 0 30px;
   }
 
   .hero {
@@ -63,10 +132,12 @@
 
   .hero-number {
     font-family: 'Lalezar', sans-serif;
-    font-size: 4.2rem;
+    font-size: 4.6rem;
     color: var(--accent);
     line-height: 1;
     margin: 0;
+    text-shadow: 0 0 30px var(--accent-glow), 0 0 60px rgba(255,198,92,0.25);
+    letter-spacing: 1px;
   }
 
   .hero-label {
@@ -125,22 +196,24 @@
 
   .pill {
     border: 1px solid var(--line);
-    background: transparent;
+    background: rgba(255,255,255,0.02);
     color: var(--text-dim);
     font-family: 'Tajawal', sans-serif;
+    font-weight: 500;
     font-size: 0.9rem;
     padding: 7px 16px;
     border-radius: 999px;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
   }
 
-  .pill:hover { border-color: var(--accent-2); color: var(--text); }
+  .pill:hover { border-color: var(--accent-2); color: var(--text); transform: translateY(-1px); }
 
   .pill.active {
-    background: var(--panel-alt);
-    border-color: var(--accent-2);
+    background: linear-gradient(135deg, rgba(255,198,92,0.24), rgba(62,238,184,0.18));
+    border-color: var(--accent);
     color: var(--text);
+    box-shadow: 0 0 18px rgba(255,198,92,0.28);
   }
 
   .chips { margin-bottom: 26px; }
@@ -153,8 +226,50 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 13px 4px;
+    padding: 13px 10px;
     border-bottom: 1px solid var(--line);
+    border-radius: 10px;
+    transition: background 0.15s ease;
+    position: relative;
+  }
+
+  .row:hover { background: rgba(255,255,255,0.025); }
+
+  .row:nth-child(1) {
+    border-right: 3px solid var(--accent);
+    background: linear-gradient(90deg, rgba(255,198,92,0.10), transparent 70%);
+  }
+  .row:nth-child(2) { border-right: 3px solid var(--accent-2); }
+  .row:nth-child(3) { border-right: 3px solid var(--accent-3); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .row { animation: rowIn 0.45s ease-out backwards; }
+    .row:nth-child(1) { animation-delay: 0.05s; }
+    .row:nth-child(2) { animation-delay: 0.10s; }
+    .row:nth-child(3) { animation-delay: 0.15s; }
+    .row:nth-child(4) { animation-delay: 0.20s; }
+    .row:nth-child(5) { animation-delay: 0.25s; }
+    .row:nth-child(6) { animation-delay: 0.30s; }
+    .row:nth-child(7) { animation-delay: 0.35s; }
+    .row:nth-child(8) { animation-delay: 0.40s; }
+  }
+
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .crown {
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .crown { animation: crownBounce 1.8s ease-in-out infinite; }
+  }
+
+  @keyframes crownBounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-3px) rotate(-4deg); }
   }
 
   .rank-glyph {
@@ -172,9 +287,21 @@
     flex-shrink: 0;
   }
 
-  .row-name {
+  .row-main {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .row-name {
     font-size: 1rem;
+  }
+
+  .row-level {
+    font-size: 0.74rem;
+    color: var(--accent-3);
   }
 
   .row-batch {
@@ -202,9 +329,13 @@
   }
 
   .founder-badge {
-    font-size: 0.75rem;
-    color: var(--accent);
-    margin-inline-start: 4px;
+    font-size: 0.72rem;
+    color: #0a1e2e;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    padding: 1px 7px;
+    border-radius: 999px;
+    margin-inline-start: 5px;
+    font-weight: 700;
   }
 
   .banner {
@@ -225,10 +356,12 @@
   }
 
   .section-title {
-    font-size: 0.95rem;
-    color: var(--text-dim);
-    margin: 0 0 12px;
+    font-family: 'Lalezar', sans-serif;
+    font-size: 1.15rem;
+    color: var(--accent-2);
+    margin: 0 0 14px;
     text-align: center;
+    letter-spacing: 0.3px;
   }
 
   .hof-row {
@@ -244,23 +377,67 @@
     font-size: 0.8rem;
   }
 
-  .war-row {
+  .streak-row {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     padding: 10px 4px;
     border-bottom: 1px solid var(--line);
   }
 
-  .war-name { font-size: 0.95rem; }
+  .streak-name { font-size: 0.94rem; }
+  .streak-name .row-batch { margin-inline-start: 6px; }
+
+  .streak-flames {
+    color: var(--accent);
+    font-size: 0.95rem;
+    text-shadow: 0 0 10px var(--accent-glow);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .streak-flames { animation: flicker 1.6s ease-in-out infinite; }
+  }
+
+  @keyframes flicker {
+    0%, 100% { text-shadow: 0 0 10px var(--accent-glow); opacity: 1; }
+    50% { text-shadow: 0 0 18px var(--accent-glow), 0 0 26px rgba(255,198,92,0.3); opacity: 0.85; }
+  }
+
+  .war-row {
+    padding: 12px 2px;
+  }
+
+  .war-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+
+  .war-name { font-size: 0.97rem; font-weight: 700; }
 
   .war-stats {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-dim);
     text-align: left;
   }
 
-  .war-stats b { color: var(--accent-2); }
+  .war-stats b { color: var(--accent); font-size: 0.95rem; }
+
+  .war-bar-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+
+  .war-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    transition: width 0.6s ease;
+  }
 
   .last-place {
     text-align: center;
@@ -277,6 +454,15 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
+    .updated.live-flash { animation: liveFlash 1s ease-out; }
+  }
+
+  @keyframes liveFlash {
+    0% { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+    100% { color: var(--text-dim); text-shadow: none; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
     .hero-number { animation: rise 0.6s ease-out; }
   }
 
@@ -287,9 +473,13 @@
 </style>
 </head>
 <body>
+  <div class="fireflies" id="fireflies"></div>
   <div class="wrap">
+    <p class="kicker">KAU · MEDICINE</p>
     <p class="site-title">🌲 غابة الطب</p>
     <p class="site-sub">منافسة ساعات المذاكرة بين دفعات كلية الطب</p>
+
+    <p class="leader-banner" id="leaderBanner" style="display:none"></p>
 
     <div class="hero">
       <p class="hero-number" id="heroNumber">—</p>
@@ -330,6 +520,11 @@
       <p class="last-place" id="lastPlaceNote"></p>
     </div>
 
+    <div class="section" id="streakSection" style="display:none">
+      <p class="section-title">🔥 سلسلة الالتزام</p>
+      <div id="streakList"></div>
+    </div>
+
     <div class="section" id="hofSection" style="display:none">
       <p class="section-title">🏛️ قاعة المشاهير — بطل كل أسبوع</p>
       <div id="hofList"></div>
@@ -343,6 +538,20 @@
   let currentPeriod = 'weekly';
   let currentBatch = 'الكل';
 
+  (function initFireflies() {
+    const container = document.getElementById('fireflies');
+    const count = window.innerWidth < 500 ? 10 : 16;
+    for (let i = 0; i < count; i++) {
+      const f = document.createElement('div');
+      f.className = 'firefly';
+      f.style.left = Math.random() * 100 + '%';
+      f.style.top = 30 + Math.random() * 65 + '%';
+      f.style.animationDelay = (Math.random() * 9).toFixed(2) + 's';
+      f.style.animationDuration = (7 + Math.random() * 5).toFixed(2) + 's';
+      container.appendChild(f);
+    }
+  })();
+
   const rankGlyph = (i) => ['🌲', '🌳', '🌿'][i] || null;
 
   function timeAgo(iso) {
@@ -355,6 +564,40 @@
     if (hrs < 24) return `منذ ${hrs} ساعة`;
     const days = Math.round(hrs / 24);
     return `منذ ${days} يوم`;
+  }
+
+  function renderLeaderBanner() {
+    const el = document.getElementById('leaderBanner');
+    const totals = DATA.weekly_batch_totals || {};
+    const names = Object.keys(totals);
+    if (names.length < 2) {
+      el.style.display = 'none';
+      return;
+    }
+    const leader = names.sort((a, b) => (totals[b] || 0) - (totals[a] || 0))[0];
+    el.style.display = 'block';
+    el.innerHTML = `<span class="crown">👑</span> الدفعة القائدة هذا الأسبوع: <b>${leader}</b>`;
+  }
+
+  let heroAnimated = false;
+  function animateHeroNumber(target) {
+    const el = document.getElementById('heroNumber');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || heroAnimated) {
+      el.textContent = target.toLocaleString('en-US');
+      heroAnimated = true;
+      return;
+    }
+    heroAnimated = true;
+    const duration = 1100;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      el.textContent = Math.round(target * eased).toLocaleString('en-US');
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
 
   function renderForest() {
@@ -393,6 +636,25 @@
     svg.innerHTML = svgContent;
   }
 
+  function renderStreaks() {
+    const section = document.getElementById('streakSection');
+    const streaks = DATA.top_streaks || [];
+    if (!streaks.length) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+    document.getElementById('streakList').innerHTML = streaks.map(s => {
+      const flameCount = Math.min(5, Math.max(1, Math.ceil(s.streak / 7)));
+      return `
+        <div class="streak-row">
+          <span class="streak-name">${s.name}${s.batch ? `<span class="row-batch">${s.batch}</span>` : ''}</span>
+          <span class="streak-flames">${'🔥'.repeat(flameCount)} ${s.streak} يوم</span>
+        </div>
+      `;
+    }).join('');
+  }
+
   function renderSpotlight() {
     const el = document.getElementById('improvedSpotlight');
     const mi = DATA.most_improved;
@@ -406,8 +668,10 @@
 
   function render() {
     if (!DATA) return;
+    renderLeaderBanner();
     renderForest();
     renderSpotlight();
+    renderStreaks();
 
     let rows;
     if (currentBatch === 'الكل') {
@@ -425,15 +689,19 @@
       listEl.innerHTML = rows.map((r, i) => `
         <div class="row">
           ${rankGlyph(i) ? `<span class="rank-glyph">${rankGlyph(i)}</span>` : `<span class="rank-num">${i + 1}</span>`}
-          <span class="row-name">${r.name}${r.founder ? '<span class="founder-badge">🏅 مؤسس</span>' : ''}${r.batch ? `<span class="row-batch">${r.batch}</span>` : ''}</span>
-          <span class="row-minutes">${r.minutes} د</span>
+          <div class="row-main">
+            <span class="row-name">${i === 0 ? '<span class="crown">👑</span> ' : ''}${r.name}${r.founder ? '<span class="founder-badge">🏅 مؤسس</span>' : ''}${r.batch ? `<span class="row-batch">${r.batch}</span>` : ''}</span>
+            ${r.level ? `<span class="row-level">Lv${r.level} · ${r.level_title || ''}</span>` : ''}
+          </div>
+          <span class="row-minutes">${r.xp != null ? r.xp + ' XP' : r.minutes + ' د'}</span>
         </div>
       `).join('');
     }
 
     const totalAllTime = (DATA.all_time || []).reduce((s, r) => s + r.minutes, 0);
-    document.getElementById('heroNumber').textContent = Math.round(totalAllTime / 60).toLocaleString('en-US');
-    document.getElementById('updated').textContent = DATA.generated_at ? `آخر تحديث: ${timeAgo(DATA.generated_at)}` : '';
+    animateHeroNumber(Math.round(totalAllTime / 60));
+    const liveTag = window.__liveConnected ? ' · 🟢 مباشر' : '';
+    document.getElementById('updated').textContent = DATA.generated_at ? `آخر تحديث: ${timeAgo(DATA.generated_at)}${liveTag}` : '';
 
     document.getElementById('examBanner').style.display = DATA.exam_mode ? 'block' : 'none';
 
@@ -444,10 +712,14 @@
     if (batchNames.length > 1) {
       warSection.style.display = 'block';
       const ranked = batchNames.sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
-      document.getElementById('batchWarList').innerHTML = ranked.map(b => `
+      const maxTotal = Math.max(...ranked.map(b => totals[b] || 0), 1);
+      document.getElementById('batchWarList').innerHTML = ranked.map((b, i) => `
         <div class="war-row">
-          <span class="war-name">${b}</span>
-          <span class="war-stats"><b>${totals[b] || 0} د</b> إجمالي — ${averages[b] || 0} د/فرد</span>
+          <div class="war-top">
+            <span class="war-name">${i === 0 ? '<span class="crown">👑</span> ' : ''}${b}</span>
+            <span class="war-stats"><b>${totals[b] || 0} د</b> — ${averages[b] || 0} د/فرد</span>
+          </div>
+          <div class="war-bar-track"><div class="war-bar-fill" style="width:${Math.max(6, (totals[b] || 0) / maxTotal * 100)}%"></div></div>
         </div>
       `).join('');
       const lastBatch = ranked[ranked.length - 1];
@@ -508,6 +780,57 @@
       document.getElementById('list').innerHTML =
         '<p class="empty">تعذّر تحميل البيانات — تأكد أن البوت يعمل ويحدّث data.json</p>';
     });
+
+  // ----- Live updates over WebSocket -----
+  // Set this to your Railway app's public URL with wss:// once deployed,
+  // e.g. 'wss://kau-forest-bot-production.up.railway.app'. Left as a
+  // placeholder for now, so the site just runs on the static data.json
+  // (refreshed on page load) until this is filled in — nothing breaks
+  // either way, this only adds the live layer on top.
+  const WS_URL = 'wss://YOUR-RAILWAY-APP.up.railway.app';
+
+  function refreshAllViews() {
+    renderChips();
+    render();
+    renderLeaderBanner();
+    renderForest();
+    renderSpotlight();
+    renderStreaks();
+    flashLiveIndicator();
+  }
+
+  function flashLiveIndicator() {
+    const el = document.getElementById('updated');
+    if (!el) return;
+    el.classList.remove('live-flash');
+    void el.offsetWidth; // restart the animation
+    el.classList.add('live-flash');
+  }
+
+  function connectLiveUpdates(retryDelay = 1000) {
+    if (!WS_URL || WS_URL.includes('YOUR-RAILWAY-APP')) return; // not configured yet
+    let ws;
+    try {
+      ws = new WebSocket(WS_URL);
+    } catch (e) {
+      return;
+    }
+    ws.onopen = () => { window.__liveConnected = true; };
+    ws.onmessage = (event) => {
+      try {
+        DATA = JSON.parse(event.data);
+        refreshAllViews();
+      } catch (e) { /* ignore malformed frame */ }
+    };
+    ws.onclose = () => {
+      window.__liveConnected = false;
+      // Reconnect with capped exponential backoff — survives Railway
+      // restarts/deploys without the page needing a manual refresh.
+      setTimeout(() => connectLiveUpdates(Math.min(retryDelay * 1.6, 30000)), retryDelay);
+    };
+    ws.onerror = () => ws.close();
+  }
+  connectLiveUpdates();
 </script>
 </body>
 </html>

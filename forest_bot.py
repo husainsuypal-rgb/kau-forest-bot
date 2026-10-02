@@ -1405,8 +1405,8 @@ async def job_daily_poll(context: ContextTypes.DEFAULT_TYPE):
         return
     await context.bot.send_poll(
         chat_id=GROUP_CHAT_ID,
-        question="أي شجرة زرعتوا اليوم؟ 🌲",
-        options=["🌲 صنوبر", "🌳 بلوط", "🌴 نخيل", "🌸 كرزية"],
+        question="⏱️ كم ساعة ذاكرت اليوم؟",
+        options=["لسا ما بدأت 😅", "أقل من ساعة", "1-2 ساعة", "3-4 ساعات", "5+ ساعات 🔥"],
         is_anonymous=False,
     )
 

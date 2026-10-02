@@ -1090,21 +1090,42 @@ def extract_daily_card_minutes(text: str) -> int | None:
     return None
 
 
+_MONTH_NAMES = {
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+    "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+}
+
+
 def extract_card_date(text: str) -> date | None:
-    """Parses the daily card's stamped MM.DD YYYY date. Unlike the Timeline
-    heuristic below, this is precise enough to use as the actual
-    session_date — which is what makes retroactive catch-up logging safe:
-    the card names its own day, so the bot never has to assume 'today'."""
+    """Parses the daily card's stamped date. Unlike the Timeline heuristic
+    below, this is precise enough to use as the actual session_date —
+    which is what makes retroactive catch-up logging safe: the card names
+    its own day, so the bot never has to assume 'today'.
+
+    Forest shows the date in at least two different formats depending on
+    the screen/version — '09.27 2026' (dotted numeric) on the Focus
+    Statistics card, and 'Oct 2, 2026 (Today)' (month name) on the
+    Overview screen — so both are tried."""
     import re
 
     m = re.search(r"(\d{2})\.(\d{2})\s*(20\d{2})", text)
-    if not m:
-        return None
-    month, day, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    try:
-        return date(year, month, day)
-    except ValueError:
-        return None
+    if m:
+        month, day, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        try:
+            return date(year, month, day)
+        except ValueError:
+            pass
+
+    m = re.search(r"([A-Za-z]{3,9})\s+(\d{1,2}),?\s+(20\d{2})", text)
+    if m:
+        month = _MONTH_NAMES.get(m.group(1)[:3].lower())
+        if month:
+            try:
+                return date(int(m.group(3)), month, int(m.group(2)))
+            except ValueError:
+                return None
+
+    return None
 
 
 def check_screenshot_date(text: str, today: date) -> str:
@@ -1168,6 +1189,11 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
         img = Image.open(buf)
         text = pytesseract.image_to_string(img)
     except Exception:
+        # Logged server-side (visible in Railway's Deploy Logs) so a real
+        # failure — e.g. the Tesseract engine missing — is distinguishable
+        # from an actually blurry photo, instead of both looking identical
+        # to the user.
+        logger.exception("OCR failed while reading a submitted screenshot")
         await update.message.reply_text("ما قدرت أقرأ الصورة، صوّر شاشة أوضح وجرّب ثانية.")
         return None
 

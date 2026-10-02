@@ -1194,7 +1194,7 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # from an actually blurry photo, instead of both looking identical
         # to the user.
         logger.exception("OCR failed while reading a submitted screenshot")
-        await update.message.reply_text("ما قدرت أقرأ الصورة، صوّر شاشة أوضح وجرّب ثانية.")
+        await update.message.reply_text("ما قدرت أقرأ الصورة، صوّر شاشة أوضح وجرّب مرة ثانية.")
         return None
 
     today = local_today()

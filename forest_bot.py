@@ -838,15 +838,13 @@ async def cmd_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if is_founder
         else ""
     )
-    name_note = (
-        ""
-        if user.username
-        else "\nℹ️ ما عندك يوزرنيم بتيليجرام، فراح يظهر اسمك الأول فقط. "
-        "تقدر تغيّره بالأمر: /setname"
-    )
+    # Each on its own line, with an LRM before the @handle, so Telegram's
+    # Arabic (RTL) rendering doesn't flip the @ to the wrong side of the
+    # username — putting an LTR token mid-sentence in RTL text does that.
     await update.message.reply_text(
-        f"✅ تم تسجيلك يا {user.first_name} ضمن دفعة {batch}!{founder_line}\n"
-        f"بالمتصدرين راح يظهر يوزرنيمك ({default_display_name(user)}) مو اسمك الكامل.{name_note}"
+        f"✅ تم تسجيلك يا {user.first_name} ضمن دفعة {batch}!{founder_line}\n\n"
+        f"📛 بالمتصدرين بيظهر اسمك كذا: \u200e{default_display_name(user)}\n"
+        "تبي تغيّره لأي اسم ثاني؟ أرسل: /setname الاسم_الي_تبيه"
     )
 
 
@@ -1298,11 +1296,12 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         minutes = context.user_data.get("pending_minutes")
         source = context.user_data.get("pending_source", "session")
         founder_line = f" 🏅 وأنت من أوائل مؤسسي {batch}!" if is_founder else ""
+        setname_hint = " (تقدر تغيّر اسمك بالمتصدرين بالأمر /setname)"
         if minutes is None:
-            await query.edit_message_text(f"✅ تم تسجيلك ضمن {batch}!{founder_line}")
+            await query.edit_message_text(f"✅ تم تسجيلك ضمن {batch}!{founder_line}{setname_hint}")
             return
         await query.edit_message_text(
-            f"✅ تم تسجيلك ضمن {batch}!{founder_line}\nوجدت {minutes} دقيقة بالصورة — تأكيد؟",
+            f"✅ تم تسجيلك ضمن {batch}!{founder_line}{setname_hint}\nوجدت {minutes} دقيقة بالصورة — تأكيد؟",
         )
         await context.bot.send_message(
             chat_id=query.message.chat_id,

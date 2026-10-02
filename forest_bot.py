@@ -980,13 +980,27 @@ async def cmd_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     title = level_title_for(level)
     remaining = minutes_for_next_level(total)
     xp = total + streak * STREAK_XP_PER_DAY
+
+    # Gap to this week's #1 — a concrete number to chase is usually more
+    # motivating than an abstract rank number.
+    week_start = local_today() - timedelta(days=local_today().weekday())
+    week_rows = leaderboard(week_start, limit=1000)
+    gap_line = ""
+    if week_rows:
+        top_total = week_rows[0]["total"]
+        my_week_total = next((r["total"] for r in week_rows if r["user_id"] == user.id), 0)
+        if my_week_total >= top_total and my_week_total > 0:
+            gap_line = "\n👑 أنت الأول هالأسبوع — حافظ عليها!"
+        elif top_total > 0:
+            gap_line = f"\n🎯 تبعد {top_total - my_week_total} دقيقة عن المركز الأول هالأسبوع"
+
     await update.message.reply_text(
         f"📊 إحصائياتك يا {user.first_name}:\n"
         f"— المستوى {level} · {title}\n"
         f"— الإجمالي: {total} دقيقة ({total // 60} ساعة) — {xp} XP\n"
-
         f"— التتابع الحالي: {streak} يوم\n"
         f"— باقي {remaining} دقيقة للمستوى {level + 1}!"
+        f"{gap_line}"
     )
 
 
@@ -1423,6 +1437,51 @@ async def job_daily_poll(context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def job_weekly_personal_recap(context: ContextTypes.DEFAULT_TYPE):
+    """DMs every registered user their own recap of the week that just
+    ended — separate from the public leaderboard post, so people get a
+    personal nudge even if they didn't crack the top of the group message.
+    Runs Sunday morning, after Saturday night's public leaderboard."""
+    today = local_today()
+    this_week_start = today - timedelta(days=today.weekday())
+    last_week_start = this_week_start - timedelta(days=7)
+
+    rows = leaderboard(last_week_start, limit=10000)
+    if not rows:
+        return
+    totals_by_user = {r["user_id"]: r["total"] for r in rows}
+    top_total = rows[0]["total"]
+
+    conn = db()
+    users = conn.execute("SELECT user_id, display_name, batch FROM users").fetchall()
+    conn.close()
+
+    for u in users:
+        minutes = totals_by_user.get(u["user_id"], 0)
+        if minutes == 0:
+            continue  # no activity last week — skip the nudge, not a guilt trip
+        streak = current_streak(u["user_id"])
+        if minutes >= top_total:
+            gap_line = "👑 كنت الأول بين الكل الأسبوع الماضي!"
+        else:
+            gap_line = f"🎯 كنت تبعد {top_total - minutes} دقيقة عن المركز الأول"
+        try:
+            await context.bot.send_message(
+                chat_id=u["user_id"],
+                text=(
+                    "📬 *ملخصك الأسبوعي*\n\n"
+                    f"⏱️ ذاكرت {minutes} دقيقة الأسبوع اللي فات\n"
+                    f"🔥 الستريك الحالي: {streak} يوم\n"
+                    f"{gap_line}"
+                ),
+                parse_mode="Markdown",
+            )
+        except Exception:
+            # Most common cause: the user blocked the bot or never started
+            # a DM with it — not worth failing the whole batch over.
+            logger.info(f"Could not DM weekly recap to user {u['user_id']}")
+
+
 async def job_weekly_leaderboard(context: ContextTypes.DEFAULT_TYPE):
     if not GROUP_CHAT_ID:
         return
@@ -1540,6 +1599,12 @@ def main():
     )
     # Monthly recap on the 1st at 09:00 local
     jq.run_monthly(job_monthly_recap, when=dtime(hour=(9 - TZ_OFFSET_HOURS) % 24), day=1)
+    # Personal weekly recap, DM'd individually, Sunday 10:00 local (weekday 6 = Sunday)
+    jq.run_daily(
+        job_weekly_personal_recap,
+        time=dtime(hour=(10 - TZ_OFFSET_HOURS) % 24),
+        days=(6,),
+    )
     # Safety-net website sync every 30 minutes, in case a per-log push fails
     jq.run_repeating(job_sync_website, interval=1800, first=60)
 

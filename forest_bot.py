@@ -1218,6 +1218,18 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+
+    # Logging only happens in DM with the bot — keeps the group feed clean
+    # (announcements, polls, milestones) instead of filling up with photo
+    # confirmations. Redirect politely rather than silently ignoring it.
+    if update.effective_chat.type != "private":
+        bot_username = context.bot.username
+        await update.message.reply_text(
+            f"📩 سجّل من الخاص مع البوت مباشرة (@{bot_username})، مو هنا بالقروب — "
+            "أبعث له الصورة هناك وبيردّ عليك."
+        )
+        return
+
     result = await _ocr_and_prepare(update, context)
     if result is None:
         return

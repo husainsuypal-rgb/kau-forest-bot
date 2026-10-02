@@ -1275,8 +1275,9 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [[InlineKeyboardButton(b, callback_data=f"regbatch:{b}")] for b in VALID_BATCHES]
         )
         await update.message.reply_text(
-            f"{kind_label}{day_note} — وجدت {minutes} دقيقة 👍\nقبل لا نسجّلها، وش دفعتك؟",
+            f"{kind_label}{day_note}\n📸 وجدت *{minutes} دقيقة* بالصورة 👍\n\nقبل لا نسجّلها — وش دفعتك؟",
             reply_markup=keyboard,
+            parse_mode="Markdown",
         )
         return
 
@@ -1293,12 +1294,14 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     )
     note = (
-        "\n(بطاقة اليوم تحل محل أي جلسات سجّلتها لنفس اليوم، مو تضاف عليها)"
+        "\n\nℹ️ بطاقة اليوم تحل محل أي جلسات سجّلتها لنفس اليوم، مو تضاف عليها"
         if source == "daily_card"
         else ""
     )
     await update.message.reply_text(
-        f"{kind_label}{day_note} — وجدت {minutes} دقيقة — تأكيد؟{note}", reply_markup=keyboard
+        f"{kind_label}{day_note}\n📸 وجدت *{minutes} دقيقة* — تأكيد؟{note}",
+        reply_markup=keyboard,
+        parse_mode="Markdown",
     )
 
 
@@ -1319,7 +1322,12 @@ async def _finalize_log(
     total = total_minutes(user.id)
     streak = current_streak(user.id)
     await update.callback_query.edit_message_text(
-        f"✅ تم تسجيل {minutes} دقيقة! إجمالي رصيدك: {total} دقيقة (Lv{level_for_total(total)} · {level_title_for(level_for_total(total))}) — 🔥 {streak} يوم متتالي"
+        "✅ *تم التسجيل بنجاح!*\n\n"
+        f"📊 {minutes} دقيقة اليوم\n"
+        f"💰 الرصيد الكلي: *{total} دقيقة*\n"
+        f"🏅 المستوى: *Lv{level_for_total(total)} · {level_title_for(level_for_total(total))}*\n"
+        f"🔥 الستريك: *{streak} يوم متتالي*",
+        parse_mode="Markdown",
     )
 
 
@@ -1333,13 +1341,17 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_founder = register_user(user.id, default_display_name(user), batch)
         minutes = context.user_data.get("pending_minutes")
         source = context.user_data.get("pending_source", "session")
-        founder_line = f" 🏅 وأنت من أوائل مؤسسي {batch}!" if is_founder else ""
-        setname_hint = " (تقدر تغيّر اسمك بالمتصدرين بالأمر /setname)"
+        founder_line = f"\n🏅 وأنت من أوائل مؤسسي {batch}!" if is_founder else ""
+        setname_hint = "\nℹ️ تقدر تغيّر اسمك بالمتصدرين بالأمر /setname"
         if minutes is None:
-            await query.edit_message_text(f"✅ تم تسجيلك ضمن {batch}!{founder_line}{setname_hint}")
+            await query.edit_message_text(
+                f"✅ تم تسجيلك ضمن *{batch}*!{founder_line}{setname_hint}",
+                parse_mode="Markdown",
+            )
             return
         await query.edit_message_text(
-            f"✅ تم تسجيلك ضمن {batch}!{founder_line}{setname_hint}\nوجدت {minutes} دقيقة بالصورة — تأكيد؟",
+            f"✅ تم تسجيلك ضمن *{batch}*!{founder_line}\n\n📸 وجدت *{minutes} دقيقة* بالصورة — تأكيد؟{setname_hint}",
+            parse_mode="Markdown",
         )
         await context.bot.send_message(
             chat_id=query.message.chat_id,

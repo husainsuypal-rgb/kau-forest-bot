@@ -480,6 +480,7 @@
     <p class="site-sub">منافسة ساعات المذاكرة بين دفعات كلية الطب</p>
 
     <p class="leader-banner" id="leaderBanner" style="display:none"></p>
+    <p class="leader-banner" id="dailyTopBanner" style="display:none"></p>
 
     <div class="hero">
       <p class="hero-number" id="heroNumber">—</p>
@@ -564,6 +565,19 @@
     if (hrs < 24) return `منذ ${hrs} ساعة`;
     const days = Math.round(hrs / 24);
     return `منذ ${days} يوم`;
+  }
+
+  function renderDailyTopBanner() {
+    const el = document.getElementById('dailyTopBanner');
+    const top = (DATA.daily || []).slice(0, 3);
+    if (!top.length) {
+      el.style.display = 'none';
+      return;
+    }
+    const medals = ['🥇', '🥈', '🥉'];
+    el.style.display = 'block';
+    el.innerHTML = '<span class="crown">👑</span> أبطال اليوم: ' +
+      top.map((r, i) => `${medals[i]} ${r.name}`).join('  ·  ');
   }
 
   function renderLeaderBanner() {
@@ -669,6 +683,7 @@
   function render() {
     if (!DATA) return;
     renderLeaderBanner();
+    renderDailyTopBanner();
     renderForest();
     renderSpotlight();
     renderStreaks();
@@ -787,8 +802,8 @@
   // placeholder for now, so the site just runs on the static data.json
   // (refreshed on page load) until this is filled in — nothing breaks
   // either way, this only adds the live layer on top.
-const WS_URL = 'wss://kau-forest-bot-production.up.railway.app';
-  
+  const WS_URL = 'wss://YOUR-RAILWAY-APP.up.railway.app';
+
   function refreshAllViews() {
     renderChips();
     render();

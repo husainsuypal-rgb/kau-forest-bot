@@ -73,6 +73,20 @@ except ImportError:
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 GROUP_CHAT_ID = os.environ.get("GROUP_CHAT_ID", "")  # e.g. -1001234567890
+
+# Telegram Topics (forum-mode threads) — optional. Leave unset and
+# everything posts to the group's default "General" topic as normal.
+# Once Topics are enabled on the group, get each topic's numeric ID by
+# opening it -> copy link -> the number at the end of the link.
+TOPIC_ACHIEVEMENTS_ID = os.environ.get("TOPIC_ACHIEVEMENTS_ID", "")
+TOPIC_SESSIONS_ID = os.environ.get("TOPIC_SESSIONS_ID", "")
+TOPIC_ANNOUNCEMENTS_ID = os.environ.get("TOPIC_ANNOUNCEMENTS_ID", "")
+
+
+def _topic_kwargs(topic_id: str) -> dict:
+    """Returns {} when a topic isn't configured (message posts to General,
+    nothing breaks), or {'message_thread_id': ...} when it is."""
+    return {"message_thread_id": int(topic_id)} if topic_id else {}
 DB_PATH = os.environ.get("DB_PATH", "forest.db")
 
 # Telegram user IDs of the people allowed to set the daily study schedule.
@@ -375,6 +389,10 @@ def local_today() -> date:
     return (datetime.utcnow() + timedelta(hours=TZ_OFFSET_HOURS)).date()
 
 
+def local_now() -> datetime:
+    return datetime.utcnow() + timedelta(hours=TZ_OFFSET_HOURS)
+
+
 def log_session(user_id: int, username: str, minutes: int, tag: str | None):
     """A single Forest-session entry (Timeline screenshot). Multiple of
     these on the same day ADD UP — unless a daily_card entry exists for
@@ -436,6 +454,30 @@ _EFFECTIVE_CTE = """
         GROUP BY user_id, session_date
     )
 """
+
+
+def daily_top_achievers(for_date: date, limit: int = 3):
+    """Top performers for ONE specific day (not a running total since a
+    date, like leaderboard() does) — for the 'top achiever(s) of the day'
+    callout in the daily summary."""
+    conn = db()
+    query = (
+        _EFFECTIVE_CTE
+        + """
+        SELECT de.user_id,
+               COALESCE(u.display_name, de.user_id) AS name,
+               COALESCE(u.batch, '') AS batch,
+               de.minutes AS total
+        FROM daily_effective de
+        LEFT JOIN users u ON u.user_id = de.user_id
+        WHERE de.session_date = :since
+        ORDER BY de.minutes DESC
+        LIMIT :limit
+        """
+    )
+    rows = conn.execute(query, {"since": for_date.isoformat(), "limit": limit}).fetchall()
+    conn.close()
+    return rows
 
 
 def total_minutes(user_id: int) -> int:
@@ -536,7 +578,11 @@ def most_improved(this_week_start: date, last_week_start: date):
     return best_user, best_delta
 
 
-def current_streak(user_id: int) -> int:
+def current_streak(user_id: int, as_of: date | None = None) -> int:
+    """Consecutive logged days ending at as_of (defaults to today).
+    Passing a past date computes what the streak was/would have been as
+    of that day — used by the streak-break detector below, which needs
+    to look at 'as of yesterday' and 'as of the day before' separately."""
     conn = db()
     rows = conn.execute(
         "SELECT DISTINCT session_date FROM sessions WHERE user_id=? ORDER BY session_date DESC",
@@ -545,7 +591,7 @@ def current_streak(user_id: int) -> int:
     conn.close()
     dates = {date.fromisoformat(r["session_date"]) for r in rows}
     streak = 0
-    cursor = local_today()
+    cursor = as_of or local_today()
     while cursor in dates:
         streak += 1
         cursor -= timedelta(days=1)
@@ -586,6 +632,7 @@ async def check_and_announce_streak_milestones(update, context, user):
                     await context.bot.send_message(
                         chat_id=GROUP_CHAT_ID,
                         text=f"{STREAK_LABELS[m]}\n{user.first_name} مستمر بدون انقطاع!",
+                        **_topic_kwargs(TOPIC_ACHIEVEMENTS_ID),
                     )
     conn.close()
 
@@ -607,6 +654,7 @@ async def check_and_announce_level_up(update, context, user):
             await context.bot.send_message(
                 chat_id=GROUP_CHAT_ID,
                 text=f"⭐ ترقية! {user.first_name} صار بالمستوى {level} — {title}",
+                **_topic_kwargs(TOPIC_ACHIEVEMENTS_ID),
             )
     conn.close()
 
@@ -754,18 +802,15 @@ async def start_ws_server(app):
     logger.info(f"Live-update WebSocket server listening on 0.0.0.0:{port}")
 
 
-def push_leaderboard_to_github():
-    """Best-effort push of the current leaderboard to a GitHub repo file,
-    so a static GitHub Pages site can read it. Silently no-ops if the
-    GitHub env vars aren't set, or if the `requests` package is missing."""
+def _push_file_to_github(repo_path: str, content_bytes: bytes, commit_message: str) -> bool:
+    """Shared GitHub Contents API push (used by both the leaderboard sync
+    and the DB backup below). Silently no-ops if the GitHub env vars
+    aren't set, or if `requests` is missing — caller just gets False back."""
     if not (REQUESTS_AVAILABLE and GITHUB_TOKEN and GITHUB_REPO):
-        return
+        return False
 
-    data = build_export_data()
-    content_str = json.dumps(data, ensure_ascii=False, indent=2)
-    content_b64 = base64.b64encode(content_str.encode("utf-8")).decode("utf-8")
-
-    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_DATA_PATH}"
+    content_b64 = base64.b64encode(content_bytes).decode("utf-8")
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{repo_path}"
     headers = {
         "Authorization": f"token {GITHUB_TOKEN}",
         "Accept": "application/vnd.github+json",
@@ -777,22 +822,51 @@ def push_leaderboard_to_github():
         if resp.status_code == 200:
             sha = resp.json().get("sha")
     except Exception:
-        logger.exception("Could not fetch existing data.json sha from GitHub")
+        logger.exception(f"Could not fetch existing sha for {repo_path} from GitHub")
 
-    payload = {
-        "message": "Update leaderboard data",
-        "content": content_b64,
-        "branch": GITHUB_BRANCH,
-    }
+    payload = {"message": commit_message, "content": content_b64, "branch": GITHUB_BRANCH}
     if sha:
         payload["sha"] = sha
 
     try:
-        put_resp = requests.put(api_url, headers=headers, json=payload, timeout=10)
+        put_resp = requests.put(api_url, headers=headers, json=payload, timeout=20)
         if put_resp.status_code not in (200, 201):
-            logger.warning("GitHub push failed (%s): %s", put_resp.status_code, put_resp.text)
+            logger.warning("GitHub push to %s failed (%s): %s", repo_path, put_resp.status_code, put_resp.text)
+            return False
+        return True
     except Exception:
-        logger.exception("Failed to push leaderboard data to GitHub")
+        logger.exception(f"Failed to push {repo_path} to GitHub")
+        return False
+
+
+def push_leaderboard_to_github():
+    """Best-effort push of the current leaderboard to a GitHub repo file,
+    so a static GitHub Pages site can read it."""
+    data = build_export_data()
+    content_str = json.dumps(data, ensure_ascii=False, indent=2)
+    _push_file_to_github(GITHUB_DATA_PATH, content_str.encode("utf-8"), "Update leaderboard data")
+
+
+def backup_database_to_github():
+    """Pushes the real SQLite database file itself (not just the
+    leaderboard JSON) to a private backup path in the repo, once a day.
+    This is the actual data — sessions, streaks, founder status, everyone's
+    history — which otherwise lives ONLY on Railway's disk with no
+    redundancy. A single overwritten 'latest' file, not timestamped
+    snapshots, to avoid the repo quietly filling up with database copies."""
+    if not os.path.exists(DB_PATH):
+        return
+    with open(DB_PATH, "rb") as f:
+        db_bytes = f.read()
+    ok = _push_file_to_github(
+        "backups/forest-latest.db", db_bytes, f"Automated DB backup {local_today().isoformat()}"
+    )
+    if ok:
+        logger.info("Database backup pushed to GitHub")
+
+
+async def job_backup_database(context: ContextTypes.DEFAULT_TYPE):
+    backup_database_to_github()
 
 
 def daily_total_all() -> int:
@@ -877,7 +951,7 @@ async def cmd_setschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     start, end = args
     text = f"📅 جدول اليوم:\n⏰ من {start} إلى {end}\nيلا بينا نزرع! 🌱"
     if GROUP_CHAT_ID:
-        msg = await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=text)
+        msg = await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=text, **_topic_kwargs(TOPIC_SESSIONS_ID))
         try:
             await context.bot.pin_chat_message(chat_id=GROUP_CHAT_ID, message_id=msg.message_id)
         except Exception:
@@ -994,6 +1068,17 @@ async def cmd_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif top_total > 0:
             gap_line = f"\n🎯 تبعد {top_total - my_week_total} دقيقة عن المركز الأول هالأسبوع"
 
+    # Same idea but for TODAY specifically — only shown when genuinely
+    # close (<30 min), so it doesn't nag everyone who's far behind.
+    today_rows = daily_top_achievers(local_today(), limit=1000)
+    daily_gap_line = ""
+    if today_rows:
+        today_top = today_rows[0]["total"]
+        my_today = next((r["total"] for r in today_rows if r["user_id"] == user.id), 0)
+        daily_gap = today_top - my_today
+        if 0 < daily_gap <= 30:
+            daily_gap_line = f"\n🔥 بس {daily_gap} دقيقة وتكون الأول اليوم!"
+
     await update.message.reply_text(
         f"📊 إحصائياتك يا {user.first_name}:\n"
         f"— المستوى {level} · {title}\n"
@@ -1001,6 +1086,7 @@ async def cmd_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"— التتابع الحالي: {streak} يوم\n"
         f"— باقي {remaining} دقيقة للمستوى {level + 1}!"
         f"{gap_line}"
+        f"{daily_gap_line}"
     )
 
 
@@ -1042,6 +1128,7 @@ async def check_and_announce_milestones(update, context, user):
                     await context.bot.send_message(
                         chat_id=GROUP_CHAT_ID,
                         text=f"🎉 مبروك لـ {user.first_name}!\n{MILESTONE_LABELS[m]}",
+                        **_topic_kwargs(TOPIC_ACHIEVEMENTS_ID),
                     )
     conn.close()
 
@@ -1419,11 +1506,224 @@ async def job_sync_website(context: ContextTypes.DEFAULT_TYPE):
 async def job_daily_summary(context: ContextTypes.DEFAULT_TYPE):
     if not GROUP_CHAT_ID:
         return
+    today = local_today()
     total = daily_total_all()
+    top = daily_top_achievers(today, limit=3)
+
+    text = f"🌲 دقائق التركيز اليوم: {total}\n"
+    if top:
+        medals = ["🥇", "🥈", "🥉"]
+        text += "\n👑 أبطال اليوم:\n"
+        for i, r in enumerate(top):
+            batch_tag = f" [{r['batch']}]" if r["batch"] else ""
+            text += f"{medals[i]} {r['name']}{batch_tag} — {r['total']} دقيقة\n"
+    text += "\nاستمروا، الغابة تكبر! 🍃"
+
     await context.bot.send_message(
         chat_id=GROUP_CHAT_ID,
-        text=f"🌲 دقائق التركيز اليوم: {total}\nاستمروا، الغابة تكبر! 🍃",
+        text=text,
+        **_topic_kwargs(TOPIC_ACHIEVEMENTS_ID),
     )
+
+
+PRAYER_CITY = os.environ.get("PRAYER_CITY", "Jeddah")
+PRAYER_COUNTRY = os.environ.get("PRAYER_COUNTRY", "SaudiArabia")
+PRAYER_METHOD = 4  # Umm al-Qura University, Makkah — correct for Saudi Arabia
+PRAYER_BUFFER_BEFORE_MIN = 10  # gap before each prayer, so a block doesn't run INTO it
+PRAYER_BUFFER_AFTER_MIN = 40  # gap after, enough time to actually pray before the next block
+JUMUAH_BUFFER_AFTER_MIN = 75  # Friday Dhuhr = Jumu'ah: khutbah + prayer runs much longer than a normal Dhuhr
+STUDY_BLOCK_MIN = 60
+STUDY_BREAK_MIN = 10
+# Saudi weekend (Fri/Sat) — no college, so fewer, longer blocks instead of
+# the weekday rhythm. weekday(): Friday=4, Saturday=5.
+WEEKEND_STUDY_BLOCK_MIN = 90
+WEEKEND_STUDY_BREAK_MIN = 15
+
+
+def fetch_prayer_times(for_date: date) -> dict | None:
+    """Today's Jeddah prayer times from the free Aladhan API (no key
+    needed). Returns None on any failure — callers degrade gracefully
+    (skip the prayer-aware gaps) rather than crash a scheduled job over
+    a flaky network call."""
+    if not REQUESTS_AVAILABLE:
+        return None
+    try:
+        resp = requests.get(
+            "https://api.aladhan.com/v1/timingsByCity",
+            params={
+                "city": PRAYER_CITY,
+                "country": PRAYER_COUNTRY,
+                "method": PRAYER_METHOD,
+                "date": for_date.strftime("%d-%m-%Y"),
+            },
+            timeout=10,
+        )
+        timings = resp.json()["data"]["timings"]
+        result = {}
+        for name in ("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"):
+            hour, minute = map(int, timings[name].split(" ")[0].split(":"))
+            result[name] = datetime.combine(for_date, dtime(hour=hour, minute=minute))
+        return result
+    except Exception:
+        logger.exception("Failed to fetch prayer times")
+        return None
+
+
+def build_study_schedule(for_date: date) -> list[tuple[datetime, datetime]]:
+    """Builds the day's study-block schedule (60 min study + 10 min break,
+    repeating across the full day), skipping windows around each of the 5
+    daily prayers so a block never lands mid-salah. If the prayer API is
+    unreachable, falls back to a plain back-to-back schedule with no
+    prayer gaps rather than posting nothing at all."""
+    prayers = fetch_prayer_times(for_date)
+    blocked = []
+    if prayers:
+        is_friday = for_date.weekday() == 4
+        for name, t in prayers.items():
+            after = JUMUAH_BUFFER_AFTER_MIN if (is_friday and name == "Dhuhr") else PRAYER_BUFFER_AFTER_MIN
+            blocked.append((
+                t - timedelta(minutes=PRAYER_BUFFER_BEFORE_MIN),
+                t + timedelta(minutes=after),
+            ))
+    blocked.sort()
+
+    is_weekend = for_date.weekday() in (4, 5)  # Friday, Saturday
+    block_min = WEEKEND_STUDY_BLOCK_MIN if is_weekend else STUDY_BLOCK_MIN
+    break_min = WEEKEND_STUDY_BREAK_MIN if is_weekend else STUDY_BREAK_MIN
+
+    day_start = datetime.combine(for_date, dtime(hour=0, minute=0))
+    day_end = datetime.combine(for_date, dtime(hour=23, minute=59))
+
+    blocks = []
+    cursor = day_start
+    while cursor + timedelta(minutes=block_min) <= day_end:
+        block_end = cursor + timedelta(minutes=block_min)
+        overlap = next((b for b in blocked if cursor < b[1] and block_end > b[0]), None)
+        if overlap:
+            cursor = overlap[1]  # jump past the prayer window, try again from there
+            continue
+        blocks.append((cursor, block_end))
+        cursor = block_end + timedelta(minutes=break_min)
+    return blocks
+
+
+STREAK_BREAK_THRESHOLD = 7  # only nudge for a streak that was actually meaningful
+
+
+async def job_check_streak_breaks(context: ContextTypes.DEFAULT_TYPE):
+    """Once a day, just after midnight: finds anyone whose real streak
+    (7+ days) broke yesterday, and sends ONE gentle, private nudge —
+    never public, since a broken streak is nobody else's business and
+    public callouts would undermine the whole feature."""
+    today = local_today()
+    yesterday = today - timedelta(days=1)
+    day_before = yesterday - timedelta(days=1)
+
+    conn = db()
+    users = conn.execute("SELECT user_id FROM users").fetchall()
+    conn.close()
+
+    for u in users:
+        was_active_yesterday = current_streak(u["user_id"], as_of=yesterday) > 0
+        if was_active_yesterday:
+            continue
+        prior_streak = current_streak(u["user_id"], as_of=day_before)
+        if prior_streak >= STREAK_BREAK_THRESHOLD:
+            try:
+                await context.bot.send_message(
+                    chat_id=u["user_id"],
+                    text=(
+                        f"💭 لاحظنا انقطاع ستريكك بعد {prior_streak} يوم متتالي.\n"
+                        "يصير، المهم ترجع تبدأ من جديد 🌱"
+                    ),
+                )
+            except Exception:
+                logger.info(f"Could not DM streak-break nudge to user {u['user_id']}")
+
+
+async def job_post_daily_schedule(context: ContextTypes.DEFAULT_TYPE):
+    """Posts the full day's study-block schedule once each morning. Each
+    block is open hosting, not an assigned shift — whoever happens to be
+    studying with Forest at that time just taps Plant Together and shares
+    the join link, since they're already there."""
+    if not GROUP_CHAT_ID:
+        return
+    today = local_today()
+    blocks = build_study_schedule(today)
+    context.application.bot_data["today_schedule"] = {
+        "date": today.isoformat(),
+        "blocks": blocks,
+        "pinged": set(),
+    }
+    if not blocks:
+        return
+
+    lines = [
+        "🌲 *جدول المذاكرة الجماعي اليوم*",
+        "",
+        "أي فترة، اللي يذاكر وقتها يسوي Plant Together بتطبيق Forest ويبعث رابط الانضمام هنا 🔗",
+        "ما فيه حد معيّن مسؤول — أول وحد متاح يسوي الجلسة",
+        "",
+    ]
+    for start, end in blocks:
+        lines.append(f"⏰ {start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')}")
+    msg = await context.bot.send_message(
+        chat_id=GROUP_CHAT_ID, text="\n".join(lines), parse_mode="Markdown", **_topic_kwargs(TOPIC_SESSIONS_ID)
+    )
+
+    # Pin it so it stays easy to find all day instead of getting buried.
+    # Unpins yesterday's first, so the pin list doesn't pile up over time.
+    try:
+        old_message_id = context.application.bot_data.get("pinned_schedule_message_id")
+        if old_message_id:
+            await context.bot.unpin_chat_message(chat_id=GROUP_CHAT_ID, message_id=old_message_id)
+        await context.bot.pin_chat_message(chat_id=GROUP_CHAT_ID, message_id=msg.message_id, disable_notification=True)
+        context.application.bot_data["pinned_schedule_message_id"] = msg.message_id
+    except Exception:
+        # Most likely cause: the bot isn't an admin, or lacks pin permission.
+        # Not worth failing the whole job over — the schedule still posted.
+        logger.warning("Could not pin the daily schedule message (check bot admin rights)")
+
+
+async def cmd_nextsession(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/nextsession — shows the next upcoming study block without needing
+    to scroll back up to the pinned morning post."""
+    sched = context.application.bot_data.get("today_schedule")
+    if not sched or sched["date"] != local_today().isoformat():
+        await update.message.reply_text("ما فيه جدول لليوم بعد — ينشر كل يوم الساعة 12:05 صباحًا.")
+        return
+    now = local_now()
+    upcoming = next((b for b in sched["blocks"] if b[1] > now), None)
+    if not upcoming:
+        await update.message.reply_text("خلصت فترات اليوم 🌙 ترقب جدول بكرة.")
+        return
+    start, end = upcoming
+    status = "جارية الحين 🟢" if start <= now else "قادمة"
+    await update.message.reply_text(
+        f"⏰ الفترة القادمة ({status}):\n{start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')}"
+    )
+
+
+async def job_check_schedule_pings(context: ContextTypes.DEFAULT_TYPE):
+    """Runs every 5 minutes; fires one short reminder at the start of each
+    scheduled block from today's posted schedule."""
+    if not GROUP_CHAT_ID:
+        return
+    sched = context.application.bot_data.get("today_schedule")
+    if not sched or sched["date"] != local_today().isoformat():
+        return
+    now = local_now()
+    for start, end in sched["blocks"]:
+        if start <= now < start + timedelta(minutes=5) and start not in sched["pinged"]:
+            sched["pinged"].add(start)
+            await context.bot.send_message(
+                chat_id=GROUP_CHAT_ID,
+                text=(
+                    f"⏰ بدأت فترة مذاكرة ({start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')})\n"
+                    "اللي يذاكر الحين، سوّي Plant Together بـ Forest وابعث الرابط 🌲"
+                ),
+                **_topic_kwargs(TOPIC_SESSIONS_ID),
+            )
 
 
 async def job_daily_poll(context: ContextTypes.DEFAULT_TYPE):
@@ -1532,7 +1832,9 @@ async def job_weekly_leaderboard(context: ContextTypes.DEFAULT_TYPE):
         last_batch = ranked[-1]
         lines.append(f"\n⚠️ {last_batch} في آخر الترتيب هذا الأسبوع — ادعوا أصحابكم قبل لا تخسرون!")
 
-    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text="\n".join(lines))
+    await context.bot.send_message(
+        chat_id=GROUP_CHAT_ID, text="\n".join(lines), **_topic_kwargs(TOPIC_ACHIEVEMENTS_ID)
+    )
 
 
 async def job_monthly_recap(context: ContextTypes.DEFAULT_TYPE):
@@ -1555,7 +1857,7 @@ async def job_monthly_recap(context: ContextTypes.DEFAULT_TYPE):
     text = f"📅 ملخص الشهر:\n— إجمالي الدقائق: {total} ({total // 60} ساعة)\n"
     if best_day:
         text += f"— أكثر يوم نشاطًا: {best_day['session_date']} ({best_day['m']} دقيقة)\n"
-    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=text)
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=text, **_topic_kwargs(TOPIC_ACHIEVEMENTS_ID))
 
 
 # ---------------------------------------------------------------------------
@@ -1581,6 +1883,7 @@ def main():
     app.add_handler(CommandHandler("findpartner", cmd_findpartner))
     app.add_handler(CommandHandler("log", cmd_log))
     app.add_handler(CommandHandler("stats", cmd_stats))
+    app.add_handler(CommandHandler("nextsession", cmd_nextsession))
     app.add_handler(CommandHandler("leaderboard", cmd_leaderboard))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(CallbackQueryHandler(handle_callback))
@@ -1607,6 +1910,14 @@ def main():
     )
     # Safety-net website sync every 30 minutes, in case a per-log push fails
     jq.run_repeating(job_sync_website, interval=1800, first=60)
+    # Full database backup to GitHub once a day at 04:00 local (quiet hour)
+    jq.run_daily(job_backup_database, time=dtime(hour=(4 - TZ_OFFSET_HOURS) % 24))
+    # Post the day's prayer-aware study-block schedule once, early each morning
+    jq.run_daily(job_post_daily_schedule, time=dtime(hour=(0 - TZ_OFFSET_HOURS) % 24, minute=5))
+    # Gentle private nudge for anyone whose 7+ day streak just broke
+    jq.run_daily(job_check_streak_breaks, time=dtime(hour=(0 - TZ_OFFSET_HOURS) % 24, minute=15))
+    # Check every 5 minutes whether a scheduled block just started
+    jq.run_repeating(job_check_schedule_pings, interval=300, first=30)
 
     logger.info("Bot starting...")
     app.run_polling()

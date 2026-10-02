@@ -1,0 +1,7 @@
+# Tells Railway's builder to install the actual Tesseract OCR engine
+# (a system package) alongside Python — pip installing the `pytesseract`
+# package alone only gets you the Python wrapper, not the engine it
+# shells out to. Without this, every photo fails to read with a generic
+# "couldn't read the image" error, no matter how clear the screenshot is.
+[phases.setup]
+aptPkgs = ["tesseract-ocr"]

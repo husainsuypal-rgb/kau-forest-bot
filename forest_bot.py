@@ -981,9 +981,13 @@ async def cmd_exammode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def cmd_findpartner(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/findpartner رياضيات — finds someone else who logged the same tag recently."""
+    """/findpartner رياضيات — finds someone else who logged the same tag
+    recently. Prefers a same-batch match (same curriculum, most useful),
+    but falls back to any batch rather than failing outright if nobody
+    in-batch is currently active on that subject."""
     user = update.effective_user
-    if not get_user(user.id):
+    caller = get_user(user.id)
+    if not caller:
         await update.message.reply_text("سجّل نفسك أولًا: /register Med25")
         return
     if not context.args:
@@ -992,24 +996,41 @@ async def cmd_findpartner(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tag = " ".join(context.args)
     cutoff = (local_today() - timedelta(days=7)).isoformat()
     conn = db()
+
     row = conn.execute(
         """
-        SELECT DISTINCT s.user_id, COALESCE(u.display_name, s.username) AS name
+        SELECT DISTINCT s.user_id, COALESCE(u.display_name, s.username) AS name, u.batch
         FROM sessions s
         LEFT JOIN users u ON u.user_id = s.user_id
-        WHERE s.tag = ? AND s.session_date >= ? AND s.user_id != ?
+        WHERE s.tag = ? AND s.session_date >= ? AND s.user_id != ? AND u.batch = ?
         LIMIT 1
         """,
-        (tag, cutoff, user.id),
+        (tag, cutoff, user.id, caller["batch"]),
     ).fetchone()
+    same_batch = row is not None
+
+    if not row:
+        row = conn.execute(
+            """
+            SELECT DISTINCT s.user_id, COALESCE(u.display_name, s.username) AS name, u.batch
+            FROM sessions s
+            LEFT JOIN users u ON u.user_id = s.user_id
+            WHERE s.tag = ? AND s.session_date >= ? AND s.user_id != ?
+            LIMIT 1
+            """,
+            (tag, cutoff, user.id),
+        ).fetchone()
     conn.close()
+
     if not row:
         await update.message.reply_text(
             f"ما لقيت أحد يذاكر «{tag}» هالأسبوع. جرب لاحقًا أو غيّر المادة."
         )
         return
+
+    batch_note = "" if same_batch else f" (من {row['batch']}، مو نفس دفعتك)"
     await update.message.reply_text(
-        f"🤝 لقيت لك رفيق مذاكرة لمادة «{tag}»: {row['name']}\n"
+        f"🤝 لقيت لك رفيق مذاكرة لمادة «{tag}»: {row['name']}{batch_note}\n"
         "راسله وابدأوا جلسة Plant Together!"
     )
 

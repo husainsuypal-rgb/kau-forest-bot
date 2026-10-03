@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:22:22.177835",
+  "generated_at": "2026-10-03T15:22:44.838832",
   "exam_mode": false,
   "daily": [
     {
@@ -46,6 +46,15 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 183
+    },
+    {
+      "name": "@liu0an",
+      "batch": "Med27",
+      "minutes": 147,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 150
     },
     {
       "name": "🐢",
@@ -140,6 +149,15 @@
       "xp": 183
     },
     {
+      "name": "@liu0an",
+      "batch": "Med27",
+      "minutes": 147,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 150
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 56,
@@ -232,6 +250,15 @@
       "xp": 183
     },
     {
+      "name": "@liu0an",
+      "batch": "Med27",
+      "minutes": 147,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 150
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 56,
@@ -322,6 +349,15 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 183
+    },
+    {
+      "name": "@liu0an",
+      "batch": "Med27",
+      "minutes": 147,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 150
     },
     {
       "name": "🐢",
@@ -439,6 +475,15 @@
         "xp": 427
       },
       {
+        "name": "@liu0an",
+        "batch": "Med27",
+        "minutes": 147,
+        "founder": false,
+        "level": 2,
+        "level_title": "🥉 برونزي",
+        "xp": 150
+      },
+      {
         "name": "🐢",
         "batch": "Med27",
         "minutes": 56,
@@ -470,12 +515,12 @@
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 64.1,
-    "Med27": 37.2
+    "Med27": 40.6
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1090,
-    "Med27": 1152
+    "Med27": 1299
   },
   "hall_of_fame": [],
   "most_improved": {

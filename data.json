@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-10-03T11:23:14.770632",
+  "exam_mode": false,
+  "daily": [
+    {
+      "name": "@Husain_Alsaati",
+      "batch": "Med25",
+      "minutes": 12,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 18
+    }
+  ],
+  "weekly": [
+    {
+      "name": "@Husain_Alsaati",
+      "batch": "Med25",
+      "minutes": 36,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 42
+    }
+  ],
+  "monthly": [
+    {
+      "name": "@Husain_Alsaati",
+      "batch": "Med25",
+      "minutes": 36,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 42
+    }
+  ],
+  "all_time": [
+    {
+      "name": "@Husain_Alsaati",
+      "batch": "Med25",
+      "minutes": 36,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 42
+    }
+  ],
+  "weekly_by_batch": {
+    "Med25": [
+      {
+        "name": "@Husain_Alsaati",
+        "batch": "Med25",
+        "minutes": 36,
+        "founder": true,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 42
+      }
+    ]
+  },
+  "weekly_batch_averages": {
+    "Med25": 36.0
+  },
+  "weekly_batch_totals": {
+    "Med25": 36
+  },
+  "hall_of_fame": [],
+  "most_improved": {
+    "name": "@Husain_Alsaati",
+    "delta": 36
+  },
+  "top_streaks": [
+    {
+      "name": "@Husain_Alsaati",
+      "batch": "Med25",
+      "streak": 2
+    }
+  ]
+}

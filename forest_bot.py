@@ -80,6 +80,7 @@ GROUP_CHAT_ID = os.environ.get("GROUP_CHAT_ID", "")  # e.g. -1001234567890
 # opening it -> copy link -> the number at the end of the link.
 TOPIC_ACHIEVEMENTS_ID = os.environ.get("TOPIC_ACHIEVEMENTS_ID", "")
 TOPIC_SESSIONS_ID = os.environ.get("TOPIC_SESSIONS_ID", "")
+TOPIC_CHAT_ID = os.environ.get("TOPIC_CHAT_ID", "")  # 💬 الدردشة العامة — used by the daily poll
 TOPIC_ANNOUNCEMENTS_ID = os.environ.get("TOPIC_ANNOUNCEMENTS_ID", "")
 
 
@@ -2096,13 +2097,36 @@ async def job_check_schedule_pings(context: ContextTypes.DEFAULT_TYPE):
             )
 
 
+DAILY_POLL_QUESTION = "⏱️ كم ساعة ذاكرت اليوم؟"
+DAILY_POLL_OPTIONS = ["لسا ما بدأت 😅", "أقل من ساعة", "1-2 ساعة", "3-4 ساعات", "5+ ساعات 🔥"]
+
+
 async def job_daily_poll(context: ContextTypes.DEFAULT_TYPE):
     if not GROUP_CHAT_ID:
         return
     await context.bot.send_poll(
         chat_id=GROUP_CHAT_ID,
-        question="⏱️ كم ساعة ذاكرت اليوم؟",
-        options=["لسا ما بدأت 😅", "أقل من ساعة", "1-2 ساعة", "3-4 ساعات", "5+ ساعات 🔥"],
+        question=DAILY_POLL_QUESTION,
+        options=DAILY_POLL_OPTIONS,
+        is_anonymous=False,
+        **_topic_kwargs(TOPIC_CHAT_ID),
+    )
+
+
+async def cmd_testpoll(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/testpoll — manager-only PRIVATE preview of the daily poll. Sends
+    a real, functioning poll to the manager's own DM (polls work fine in
+    private chats) instead of the group — same private-testing pattern
+    as /testschedule, for the same reason: nothing untested touches the
+    group with 100+ real members in it."""
+    user = update.effective_user
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
+        return
+    await context.bot.send_poll(
+        chat_id=user.id,
+        question=DAILY_POLL_QUESTION,
+        options=DAILY_POLL_OPTIONS,
         is_anonymous=False,
     )
 
@@ -2252,6 +2276,7 @@ def main():
     app.add_handler(CommandHandler("testschedule", cmd_testschedule))
     app.add_handler(CommandHandler("checkschedule", cmd_checkschedule))
     app.add_handler(CommandHandler("postscheduletoday", cmd_postscheduletoday))
+    app.add_handler(CommandHandler("testpoll", cmd_testpoll))
     app.add_handler(CommandHandler("enablescheduleposts", cmd_enablescheduleposts))
     app.add_handler(CommandHandler("pausescheduleposts", cmd_pausescheduleposts))
     app.add_handler(CommandHandler("setcollegehours", cmd_setcollegehours))

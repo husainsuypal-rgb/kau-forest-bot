@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:54:52.521475",
+  "generated_at": "2026-10-03T15:58:39.807486",
   "exam_mode": false,
   "daily": [
     {
@@ -12,7 +12,7 @@
       "xp": 615
     },
     {
-      "name": "La goat 👨‍⚕️",
+      "name": "R La goat👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -21,7 +21,7 @@
       "xp": 603
     },
     {
-      "name": "@Yu_Chan170",
+      "name": "Dr.Judi",
       "batch": "Med27",
       "minutes": 540,
       "founder": false,
@@ -46,6 +46,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 420,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
     },
     {
       "name": "rania☝🏻",
@@ -109,15 +118,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 47
-    },
-    {
-      "name": "@iamjuwana",
-      "batch": "Med27",
-      "minutes": 28,
-      "founder": true,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 31
     },
     {
       "name": "Awfa",
@@ -167,7 +167,7 @@
       "xp": 615
     },
     {
-      "name": "La goat 👨‍⚕️",
+      "name": "R La goat👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -176,7 +176,7 @@
       "xp": 603
     },
     {
-      "name": "@Yu_Chan170",
+      "name": "Dr.Judi",
       "batch": "Med27",
       "minutes": 540,
       "founder": false,
@@ -201,6 +201,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 420,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
     },
     {
       "name": "rania☝🏻",
@@ -273,15 +282,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
-    },
-    {
-      "name": "@iamjuwana",
-      "batch": "Med27",
-      "minutes": 28,
-      "founder": true,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 31
     },
     {
       "name": "Awfa",
@@ -322,7 +322,7 @@
       "xp": 615
     },
     {
-      "name": "La goat 👨‍⚕️",
+      "name": "R La goat👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -331,7 +331,7 @@
       "xp": 603
     },
     {
-      "name": "@Yu_Chan170",
+      "name": "Dr.Judi",
       "batch": "Med27",
       "minutes": 540,
       "founder": false,
@@ -356,6 +356,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 420,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
     },
     {
       "name": "rania☝🏻",
@@ -428,15 +437,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
-    },
-    {
-      "name": "@iamjuwana",
-      "batch": "Med27",
-      "minutes": 28,
-      "founder": true,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 31
     },
     {
       "name": "Awfa",
@@ -477,7 +477,7 @@
       "xp": 615
     },
     {
-      "name": "La goat 👨‍⚕️",
+      "name": "R La goat👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -486,7 +486,7 @@
       "xp": 603
     },
     {
-      "name": "@Yu_Chan170",
+      "name": "Dr.Judi",
       "batch": "Med27",
       "minutes": 540,
       "founder": false,
@@ -511,6 +511,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 420,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
     },
     {
       "name": "rania☝🏻",
@@ -583,15 +592,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
-    },
-    {
-      "name": "@iamjuwana",
-      "batch": "Med27",
-      "minutes": 28,
-      "founder": true,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 31
     },
     {
       "name": "Awfa",
@@ -709,7 +709,7 @@
         "xp": 615
       },
       {
-        "name": "La goat 👨‍⚕️",
+        "name": "R La goat👨‍⚕️",
         "batch": "Med27",
         "minutes": 600,
         "founder": false,
@@ -718,7 +718,7 @@
         "xp": 603
       },
       {
-        "name": "@Yu_Chan170",
+        "name": "Dr.Judi",
         "batch": "Med27",
         "minutes": 540,
         "founder": false,
@@ -734,6 +734,15 @@
         "level": 3,
         "level_title": "🥉 برونزي",
         "xp": 427
+      },
+      {
+        "name": "@iamjuwana",
+        "batch": "Med27",
+        "minutes": 420,
+        "founder": true,
+        "level": 3,
+        "level_title": "🥉 برونزي",
+        "xp": 423
       },
       {
         "name": "@DrJoudirbreo",
@@ -761,27 +770,18 @@
         "level": 1,
         "level_title": "🥉 برونزي",
         "xp": 47
-      },
-      {
-        "name": "@iamjuwana",
-        "batch": "Med27",
-        "minutes": 28,
-        "founder": true,
-        "level": 1,
-        "level_title": "🥉 برونزي",
-        "xp": 31
       }
     ]
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 58.1,
-    "Med27": 89.9
+    "Med27": 99.5
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1221,
-    "Med27": 3687
+    "Med27": 4079
   },
   "hall_of_fame": [],
   "most_improved": {

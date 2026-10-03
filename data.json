@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:12:31.348824",
+  "generated_at": "2026-10-03T15:14:17.714588",
   "exam_mode": false,
   "daily": [
     {
@@ -10,6 +10,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 447
+    },
+    {
+      "name": "Julia",
+      "batch": "Med26",
+      "minutes": 424,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 427
     },
     {
       "name": "@Husain_Alsaati",
@@ -32,6 +41,15 @@
       "xp": 447
     },
     {
+      "name": "Julia",
+      "batch": "Med26",
+      "minutes": 424,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 427
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -52,6 +70,15 @@
       "xp": 447
     },
     {
+      "name": "Julia",
+      "batch": "Med26",
+      "minutes": 424,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 427
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -70,6 +97,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 447
+    },
+    {
+      "name": "Julia",
+      "batch": "Med26",
+      "minutes": 424,
+      "founder": true,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 427
     },
     {
       "name": "@Husain_Alsaati",
@@ -102,16 +138,25 @@
         "level": 3,
         "level_title": "🥉 برونزي",
         "xp": 447
+      },
+      {
+        "name": "Julia",
+        "batch": "Med26",
+        "minutes": 424,
+        "founder": true,
+        "level": 3,
+        "level_title": "🥉 برونزي",
+        "xp": 427
       }
     ]
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 49.3
+    "Med26": 62.0
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 444
+    "Med26": 868
   },
   "hall_of_fame": [],
   "most_improved": {
@@ -126,6 +171,11 @@
     },
     {
       "name": "Miralita",
+      "batch": "Med26",
+      "streak": 1
+    },
+    {
+      "name": "Julia",
       "batch": "Med26",
       "streak": 1
     }

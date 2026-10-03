@@ -1094,17 +1094,51 @@ async def cmd_checkschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await cmd_testschedule(update, context)
 
 
-async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/testschedule — manager-only manual trigger for the daily study-
-    block schedule, instead of waiting for the automatic 00:05 post. Does
-    not interfere with tomorrow's automatic post — that still fires on
-    its own regardless."""
+async def cmd_enablescheduleposts(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/enablescheduleposts — manager-only. Turns ON real group posting
+    for the daily schedule (both the morning post and the per-block
+    pings). Off by default — see job_post_daily_schedule."""
     user = update.effective_user
     if MANAGER_IDS and user.id not in MANAGER_IDS:
         await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
         return
-    await job_post_daily_schedule(context)
-    await update.message.reply_text("✅ تم نشر جدول اليوم يدويًا.")
+    set_setting("schedule_posting_enabled", "true")
+    await update.message.reply_text(
+        "✅ تفعّل نشر الجدول بالقروب. من أول جدول جاي (يدوي أو تلقائي)، بينشر بالقروب مباشرة."
+    )
+
+
+async def cmd_pausescheduleposts(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/pausescheduleposts — manager-only. Puts group posting back to
+    private-only mode, in case something needs re-testing later."""
+    user = update.effective_user
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
+        return
+    set_setting("schedule_posting_enabled", "false")
+    await update.message.reply_text("⏸️ تم إيقاف نشر الجدول بالقروب مؤقتًا — بيرجع يوصلكم خاص بس.")
+
+
+async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/testschedule — manager-only PRIVATE preview of today's schedule.
+    Deliberately does NOT post to the group or touch the pinned message —
+    with 100+ real members now, a test command that posts publicly is a
+    real risk, not just a formatting inconvenience. This only replies to
+    whoever ran the command, in whatever chat they ran it in."""
+    user = update.effective_user
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
+        return
+    today = local_today()
+    blocks, gap_labels = build_study_schedule(today)
+    if not blocks:
+        await update.message.reply_text("ما طلع جدول لليوم (تحقق من API أوقات الصلاة أو السجل).")
+        return
+    preview_sched = {"date": today.isoformat(), "blocks": blocks, "gap_labels": gap_labels, "done": set()}
+    await update.message.reply_text(
+        "👁️ معاينة خاصة بس — ما انبعث بالقروب:\n\n" + render_schedule_message(preview_sched),
+        parse_mode="HTML",
+    )
 
 
 async def cmd_setschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1928,9 +1962,27 @@ async def job_post_daily_schedule(context: ContextTypes.DEFAULT_TYPE):
     if not blocks:
         return
 
+    rendered = render_schedule_message(sched)
+
+    # Kill-switch: while this is "off", even the AUTOMATIC daily post goes
+    # privately to managers instead of the real group — group has 100+
+    # real members now, so nothing schedule-related touches it publicly
+    # until a manager explicitly confirms it's safe via /enablescheduleposts.
+    if get_setting("schedule_posting_enabled", "false") != "true":
+        for mid in MANAGER_IDS:
+            try:
+                await context.bot.send_message(
+                    chat_id=mid,
+                    text="⚠️ نشر الجدول بالقروب موقوف حاليًا (وضع الاختبار). هذا اللي كان بينشر:\n\n" + rendered,
+                    parse_mode="HTML",
+                )
+            except Exception:
+                logger.info(f"Could not DM schedule preview to manager {mid}")
+        return
+
     msg = await context.bot.send_message(
         chat_id=GROUP_CHAT_ID,
-        text=render_schedule_message(sched),
+        text=rendered,
         parse_mode="HTML",
         **_topic_kwargs(TOPIC_SESSIONS_ID),
     )
@@ -1982,6 +2034,8 @@ async def job_check_schedule_pings(context: ContextTypes.DEFAULT_TYPE):
     scheduled block from today's posted schedule."""
     if not GROUP_CHAT_ID:
         return
+    if get_setting("schedule_posting_enabled", "false") != "true":
+        return  # same kill-switch as the morning post — stay quiet in the group until enabled
     sched = context.application.bot_data.get("today_schedule")
     if not sched or sched["date"] != local_today().isoformat():
         return
@@ -2154,6 +2208,8 @@ def main():
     app.add_handler(CommandHandler("setschedule", cmd_setschedule))
     app.add_handler(CommandHandler("testschedule", cmd_testschedule))
     app.add_handler(CommandHandler("checkschedule", cmd_checkschedule))
+    app.add_handler(CommandHandler("enablescheduleposts", cmd_enablescheduleposts))
+    app.add_handler(CommandHandler("pausescheduleposts", cmd_pausescheduleposts))
     app.add_handler(CommandHandler("setcollegehours", cmd_setcollegehours))
     app.add_handler(CommandHandler("exammode", cmd_exammode))
     app.add_handler(CommandHandler("findpartner", cmd_findpartner))

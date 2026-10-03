@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:25:27.949882",
+  "generated_at": "2026-10-03T15:26:28.673175",
   "exam_mode": false,
   "daily": [
     {
@@ -50,11 +50,11 @@
     {
       "name": "🐢",
       "batch": "Med27",
-      "minutes": 264,
+      "minutes": 312,
       "founder": false,
       "level": 3,
       "level_title": "🥉 برونزي",
-      "xp": 267
+      "xp": 315
     },
     {
       "name": "Yara",
@@ -178,11 +178,11 @@
     {
       "name": "🐢",
       "batch": "Med27",
-      "minutes": 264,
+      "minutes": 312,
       "founder": false,
       "level": 3,
       "level_title": "🥉 برونزي",
-      "xp": 267
+      "xp": 315
     },
     {
       "name": "Yara",
@@ -306,11 +306,11 @@
     {
       "name": "🐢",
       "batch": "Med27",
-      "minutes": 264,
+      "minutes": 312,
       "founder": false,
       "level": 3,
       "level_title": "🥉 برونزي",
-      "xp": 267
+      "xp": 315
     },
     {
       "name": "Yara",
@@ -434,11 +434,11 @@
     {
       "name": "🐢",
       "batch": "Med27",
-      "minutes": 264,
+      "minutes": 312,
       "founder": false,
       "level": 3,
       "level_title": "🥉 برونزي",
-      "xp": 267
+      "xp": 315
     },
     {
       "name": "Yara",
@@ -612,11 +612,11 @@
       {
         "name": "🐢",
         "batch": "Med27",
-        "minutes": 264,
+        "minutes": 312,
         "founder": false,
         "level": 3,
         "level_title": "🥉 برونزي",
-        "xp": 267
+        "xp": 315
       },
       {
         "name": "@liu0an",
@@ -649,13 +649,13 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 66.7,
-    "Med27": 58.3
+    "Med26": 63.2,
+    "Med27": 59.8
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1201,
-    "Med27": 1867
+    "Med27": 1915
   },
   "hall_of_fame": [],
   "most_improved": {

@@ -555,16 +555,29 @@
 
   const rankGlyph = (i) => ['🌲', '🌳', '🌿'][i] || null;
 
+  // Arabic number-noun agreement: 1 and 2 use their own word (no digit
+  // shown), 3-10 use "N " + plural noun, 11+ falls back to "N " +
+  // singular noun — e.g. "منذ دقيقة" (1), "منذ دقيقتين" (2),
+  // "منذ 3 دقائق" (3-10), "منذ 15 دقيقة" (11+). A flat "N + singular"
+  // for every count, like plain English pluralization, reads as a
+  // grammar mistake in Arabic.
+  function arabicCount(n, singular, dual, plural) {
+    if (n === 1) return singular;
+    if (n === 2) return dual;
+    if (n >= 3 && n <= 10) return `${n} ${plural}`;
+    return `${n} ${singular}`;
+  }
+
   function timeAgo(iso) {
     if (!iso) return '';
     const diffMs = Date.now() - new Date(iso).getTime();
     const mins = Math.round(diffMs / 60000);
     if (mins < 1) return 'الآن';
-    if (mins < 60) return `منذ ${mins} دقيقة`;
+    if (mins < 60) return `منذ ${arabicCount(mins, 'دقيقة', 'دقيقتين', 'دقائق')}`;
     const hrs = Math.round(mins / 60);
-    if (hrs < 24) return `منذ ${hrs} ساعة`;
+    if (hrs < 24) return `منذ ${arabicCount(hrs, 'ساعة', 'ساعتين', 'ساعات')}`;
     const days = Math.round(hrs / 24);
-    return `منذ ${days} يوم`;
+    return `منذ ${arabicCount(days, 'يوم', 'يومين', 'أيام')}`;
   }
 
   function renderDailyTopBanner() {
@@ -802,7 +815,8 @@
   // placeholder for now, so the site just runs on the static data.json
   // (refreshed on page load) until this is filled in — nothing breaks
   // either way, this only adds the live layer on top.
-const WS_URL = 'wss://kau-forest-bot-production.up.railway.app';
+  const WS_URL = 'wss://YOUR-RAILWAY-APP.up.railway.app';
+
   function refreshAllViews() {
     renderChips();
     render();

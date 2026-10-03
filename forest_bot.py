@@ -105,6 +105,13 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO = os.environ.get("GITHUB_REPO", "")  # e.g. "yourname/study-leaderboard"
 GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 GITHUB_DATA_PATH = os.environ.get("GITHUB_DATA_PATH", "data.json")
+# Off by default — the WebSocket live-update system already handles the
+# site staying fresh, so this static-JSON sync is redundant and its
+# commits were triggering a full Railway redeploy on every single log
+# (since it shares GITHUB_TOKEN/GITHUB_REPO with the unrelated DB backup
+# feature). Set to "true" only if you specifically want the static
+# fallback file kept fresh too, independent of DB backups.
+ENABLE_GITHUB_DATA_SYNC = os.environ.get("ENABLE_GITHUB_DATA_SYNC", "").lower() == "true"
 
 # Official launch date (YYYY-MM-DD). Before this date, logging is blocked
 # entirely — registration still works (early joiners still get founder
@@ -883,7 +890,10 @@ def _push_file_to_github(repo_path: str, content_bytes: bytes, commit_message: s
 
 def push_leaderboard_to_github():
     """Best-effort push of the current leaderboard to a GitHub repo file,
-    so a static GitHub Pages site can read it."""
+    so a static GitHub Pages site can read it. Off unless explicitly
+    enabled — see ENABLE_GITHUB_DATA_SYNC above."""
+    if not ENABLE_GITHUB_DATA_SYNC:
+        return
     data = build_export_data()
     content_str = json.dumps(data, ensure_ascii=False, indent=2)
     _push_file_to_github(GITHUB_DATA_PATH, content_str.encode("utf-8"), "Update leaderboard data")

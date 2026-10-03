@@ -1094,6 +1094,26 @@ async def cmd_checkschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await cmd_testschedule(update, context)
 
 
+async def cmd_postscheduletoday(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/postscheduletoday — manager-only. Triggers today's REAL schedule
+    post right now, instead of waiting for tomorrow's automatic 00:05
+    run. Respects the same enabled/paused toggle as the automatic post —
+    if posting is still paused, this safely goes to managers privately
+    instead of the group, same as always."""
+    user = update.effective_user
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
+        return
+    await job_post_daily_schedule(context)
+    if get_setting("schedule_posting_enabled", "false") == "true":
+        await update.message.reply_text("✅ تم نشر جدول اليوم بالقروب فعليًا.")
+    else:
+        await update.message.reply_text(
+            "📩 النشر بالقروب موقوف حاليًا، فبعثت الجدول لكم خاص بدالها. "
+            "فعّل النشر بـ /enablescheduleposts إذا تبيه ينزل بالقروب."
+        )
+
+
 async def cmd_enablescheduleposts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/enablescheduleposts — manager-only. Turns ON real group posting
     for the daily schedule (both the morning post and the per-block
@@ -1795,6 +1815,23 @@ def fetch_prayer_times(for_date: date) -> dict | None:
         return None
 
 
+def _ceil_5min(dt: datetime) -> datetime:
+    """Rounds UP to the next clean 5-minute mark — safe for a block's
+    START time, since it only ever delays it further, never earlier into
+    whatever buffer it was placed after."""
+    dt = dt.replace(second=0, microsecond=0)
+    remainder = dt.minute % 5
+    return dt if remainder == 0 else dt + timedelta(minutes=5 - remainder)
+
+
+def _floor_5min(dt: datetime) -> datetime:
+    """Rounds DOWN to the previous clean 5-minute mark — safe for a
+    block's END time, since it only ever pulls it earlier, never later
+    into whatever gap comes right after it."""
+    dt = dt.replace(second=0, microsecond=0)
+    return dt - timedelta(minutes=dt.minute % 5)
+
+
 PRAYER_NAME_AR = {
     "Fajr": "الفجر", "Dhuhr": "الظهر", "Asr": "العصر", "Maghrib": "المغرب", "Isha": "العشاء",
 }
@@ -1877,6 +1914,12 @@ def build_study_schedule(for_date: date) -> tuple[list[tuple[datetime, datetime]
             pending_label = None
         blocks.append((cursor, block_end))
         cursor = block_end + timedelta(minutes=break_min)
+
+    # Cosmetic pass: round displayed times to clean 5-minute marks. Start
+    # rounds UP (never earlier/less safe), end rounds DOWN (never later/
+    # less safe) — the prayer-safety math above is already done against
+    # the PRECISE times before this point, so this can't reopen a gap.
+    blocks = [(_ceil_5min(s), _floor_5min(e)) for s, e in blocks]
     return blocks, gap_labels
 
 
@@ -2208,6 +2251,7 @@ def main():
     app.add_handler(CommandHandler("setschedule", cmd_setschedule))
     app.add_handler(CommandHandler("testschedule", cmd_testschedule))
     app.add_handler(CommandHandler("checkschedule", cmd_checkschedule))
+    app.add_handler(CommandHandler("postscheduletoday", cmd_postscheduletoday))
     app.add_handler(CommandHandler("enablescheduleposts", cmd_enablescheduleposts))
     app.add_handler(CommandHandler("pausescheduleposts", cmd_pausescheduleposts))
     app.add_handler(CommandHandler("setcollegehours", cmd_setcollegehours))

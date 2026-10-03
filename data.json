@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:39:54.297394",
+  "generated_at": "2026-10-03T15:54:52.521475",
   "exam_mode": false,
   "daily": [
     {
@@ -19,6 +19,15 @@
       "level": 4,
       "level_title": "🥈 فضي",
       "xp": 603
+    },
+    {
+      "name": "@Yu_Chan170",
+      "batch": "Med27",
+      "minutes": 540,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 543
     },
     {
       "name": "Miralita",
@@ -167,6 +176,15 @@
       "xp": 603
     },
     {
+      "name": "@Yu_Chan170",
+      "batch": "Med27",
+      "minutes": 540,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 543
+    },
+    {
       "name": "Miralita",
       "batch": "Med26",
       "minutes": 444,
@@ -313,6 +331,15 @@
       "xp": 603
     },
     {
+      "name": "@Yu_Chan170",
+      "batch": "Med27",
+      "minutes": 540,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 543
+    },
+    {
       "name": "Miralita",
       "batch": "Med26",
       "minutes": 444,
@@ -457,6 +484,15 @@
       "level": 4,
       "level_title": "🥈 فضي",
       "xp": 603
+    },
+    {
+      "name": "@Yu_Chan170",
+      "batch": "Med27",
+      "minutes": 540,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 543
     },
     {
       "name": "Miralita",
@@ -682,6 +718,15 @@
         "xp": 603
       },
       {
+        "name": "@Yu_Chan170",
+        "batch": "Med27",
+        "minutes": 540,
+        "founder": false,
+        "level": 4,
+        "level_title": "🥈 فضي",
+        "xp": 543
+      },
+      {
         "name": "Julia",
         "batch": "Med27",
         "minutes": 424,
@@ -730,13 +775,13 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 61.0,
-    "Med27": 82.8
+    "Med26": 58.1,
+    "Med27": 89.9
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1221,
-    "Med27": 3147
+    "Med27": 3687
   },
   "hall_of_fame": [],
   "most_improved": {

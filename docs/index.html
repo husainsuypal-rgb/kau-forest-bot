@@ -718,7 +718,7 @@
         <div class="row">
           ${rankGlyph(i) ? `<span class="rank-glyph">${rankGlyph(i)}</span>` : `<span class="rank-num">${i + 1}</span>`}
           <div class="row-main">
-            <span class="row-name">${i === 0 ? '<span class="crown">👑</span> ' : ''}${r.name}${r.founder ? '<span class="founder-badge">🏅 مؤسس</span>' : ''}${r.batch ? `<span class="row-batch">${r.batch}</span>` : ''}</span>
+            <span class="row-name">${i === 0 ? '<span class="crown">👑</span> ' : ''}${r.name}${r.founder ? '<span class="founder-badge">🏅 رائد</span>' : ''}${r.batch ? `<span class="row-batch">${r.batch}</span>` : ''}</span>
             ${r.level ? `<span class="row-level">Lv${r.level} · ${r.level_title || ''}</span>` : ''}
           </div>
           <span class="row-minutes">${r.xp != null ? r.xp + ' XP' : r.minutes + ' د'}</span>

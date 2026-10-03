@@ -1200,23 +1200,41 @@ async def cmd_pausescheduleposts(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/testschedule — manager-only PRIVATE preview of today's schedule.
-    Deliberately does NOT post to the group or touch the pinned message —
-    with 100+ real members now, a test command that posts publicly is a
-    real risk, not just a formatting inconvenience. This only replies to
-    whoever ran the command, in whatever chat they ran it in."""
+    """/testschedule [tomorrow|YYYY-MM-DD] — manager-only PRIVATE preview
+    of a day's schedule, defaulting to today. Deliberately does NOT post
+    to the group or touch the pinned message — with 100+ real members
+    now, a test command that posts publicly is a real risk, not just a
+    formatting inconvenience. This only replies to whoever ran the
+    command, in whatever chat they ran it in."""
     user = update.effective_user
     if MANAGER_IDS and user.id not in MANAGER_IDS:
         await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
         return
-    today = local_today()
-    blocks, gap_labels = build_study_schedule(today)
+
+    target = local_today()
+    arg_label = "اليوم"
+    if context.args:
+        arg = context.args[0].strip().lower()
+        if arg in ("tomorrow", "غدا", "غدًا", "بكرة", "بكره"):
+            target = target + timedelta(days=1)
+            arg_label = "بكرة"
+        else:
+            try:
+                target = date.fromisoformat(arg)
+                arg_label = target.isoformat()
+            except ValueError:
+                await update.message.reply_text(
+                    "استخدم: /testschedule أو /testschedule tomorrow أو /testschedule 2026-10-05"
+                )
+                return
+
+    blocks, gap_labels = build_study_schedule(target)
     if not blocks:
-        await update.message.reply_text("ما طلع جدول لليوم (تحقق من API أوقات الصلاة أو السجل).")
+        await update.message.reply_text(f"ما طلع جدول ليوم {arg_label} (تحقق من API أوقات الصلاة أو السجل).")
         return
-    preview_sched = {"date": today.isoformat(), "blocks": blocks, "gap_labels": gap_labels, "done": set()}
+    preview_sched = {"date": target.isoformat(), "blocks": blocks, "gap_labels": gap_labels, "done": set()}
     await update.message.reply_text(
-        "👁️ معاينة خاصة بس — ما انبعث بالقروب:\n\n" + render_schedule_message(preview_sched),
+        f"👁️ معاينة خاصة ليوم {arg_label} — ما انبعث بالقروب:\n\n" + render_schedule_message(preview_sched),
         parse_mode="HTML",
     )
 

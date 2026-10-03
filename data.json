@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:22:01.470620",
+  "generated_at": "2026-10-03T15:22:11.064815",
   "exam_mode": false,
   "daily": [
     {
@@ -55,6 +55,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 49
+    },
+    {
+      "name": "Abdullah (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 44,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 47
     },
     {
       "name": "🐢",
@@ -140,6 +149,15 @@
       "xp": 49
     },
     {
+      "name": "Abdullah (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 44,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 47
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 43,
@@ -223,6 +241,15 @@
       "xp": 49
     },
     {
+      "name": "Abdullah (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 44,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 47
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 43,
@@ -304,6 +331,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 49
+    },
+    {
+      "name": "Abdullah (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 44,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 47
     },
     {
       "name": "🐢",
@@ -403,6 +439,15 @@
         "xp": 603
       },
       {
+        "name": "Abdullah (Med27 Leader)",
+        "batch": "Med27",
+        "minutes": 44,
+        "founder": true,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 47
+      },
+      {
         "name": "🐢",
         "batch": "Med27",
         "minutes": 43,
@@ -425,12 +470,12 @@
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 84.1,
-    "Med27": 23.1
+    "Med27": 24.7
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1514,
-    "Med27": 671
+    "Med27": 715
   },
   "hall_of_fame": [],
   "most_improved": {

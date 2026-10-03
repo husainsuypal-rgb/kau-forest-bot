@@ -1916,18 +1916,27 @@ async def job_post_daily_schedule(context: ContextTypes.DEFAULT_TYPE):
         **_topic_kwargs(TOPIC_SESSIONS_ID),
     )
 
-    # Pin it so it stays easy to find all day instead of getting buried.
-    # Unpins yesterday's first, so the pin list doesn't pile up over time.
-    try:
-        old_message_id = context.application.bot_data.get("pinned_schedule_message_id")
-        if old_message_id:
+    # Unpin yesterday's message first — in its OWN try/except, since a
+    # stale/invalid old message_id (e.g. from before a group migrated to
+    # a supergroup) must never block pinning today's message or updating
+    # which message_id is "current" below.
+    old_message_id = context.application.bot_data.get("pinned_schedule_message_id")
+    if old_message_id:
+        try:
             await context.bot.unpin_chat_message(chat_id=GROUP_CHAT_ID, message_id=old_message_id)
+        except Exception:
+            pass  # most likely just a stale reference — harmless either way
+
+    try:
         await context.bot.pin_chat_message(chat_id=GROUP_CHAT_ID, message_id=msg.message_id, disable_notification=True)
-        context.application.bot_data["pinned_schedule_message_id"] = msg.message_id
     except Exception:
         # Most likely cause: the bot isn't an admin, or lacks pin permission.
         # Not worth failing the whole job over — the schedule still posted.
         logger.warning("Could not pin the daily schedule message (check bot admin rights)")
+
+    # Always update this, pin succeeded or not — the "تم" done-marking
+    # feature needs to know which message is current regardless.
+    context.application.bot_data["pinned_schedule_message_id"] = msg.message_id
 
 
 async def cmd_nextsession(update: Update, context: ContextTypes.DEFAULT_TYPE):

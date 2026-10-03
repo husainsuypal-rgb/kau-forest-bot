@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:23:23.283737",
+  "generated_at": "2026-10-03T15:23:32.348208",
   "exam_mode": false,
   "daily": [
     {
@@ -64,6 +64,15 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 150
+    },
+    {
+      "name": "@arterialerror",
+      "batch": "Med26",
+      "minutes": 110,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 113
     },
     {
       "name": "🐢",
@@ -176,6 +185,15 @@
       "xp": 150
     },
     {
+      "name": "@arterialerror",
+      "batch": "Med26",
+      "minutes": 110,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 113
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 70,
@@ -284,6 +302,15 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 150
+    },
+    {
+      "name": "@arterialerror",
+      "batch": "Med26",
+      "minutes": 110,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 113
     },
     {
       "name": "🐢",
@@ -396,6 +423,15 @@
       "xp": 150
     },
     {
+      "name": "@arterialerror",
+      "batch": "Med26",
+      "minutes": 110,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 113
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 70,
@@ -482,6 +518,15 @@
         "xp": 183
       },
       {
+        "name": "@arterialerror",
+        "batch": "Med26",
+        "minutes": 110,
+        "founder": true,
+        "level": 2,
+        "level_title": "🥉 برونزي",
+        "xp": 113
+      },
+      {
         "name": "@DrrSultan",
         "batch": "Med26",
         "minutes": 46,
@@ -559,12 +604,12 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 64.1,
+    "Med26": 70.6,
     "Med27": 52.3
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 1090,
+    "Med26": 1200,
     "Med27": 1673
   },
   "hall_of_fame": [],

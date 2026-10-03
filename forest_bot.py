@@ -1887,6 +1887,13 @@ def build_study_schedule(for_date: date) -> tuple[list[tuple[datetime, datetime]
     day_start = datetime.combine(for_date, dtime(hour=0, minute=0))
     day_end = datetime.combine(for_date, dtime(hour=23, minute=59))
 
+    # cursor is kept exactly 5-minute-aligned at all times — day_start
+    # (00:00) already is, block_min/break_min are both multiples of 5, and
+    # every place cursor jumps past a blocked window below rounds that
+    # jump to a clean mark too. That's what keeps the WHOLE day's grid
+    # exact, instead of rounding each block independently after the fact
+    # (which drifts: a later block's displayed gap can silently stop
+    # matching the real 10/15-min break, with no label explaining why).
     blocks = []
     gap_labels = {}
     pending_label = None
@@ -1899,14 +1906,15 @@ def build_study_schedule(for_date: date) -> tuple[list[tuple[datetime, datetime]
             # but don't just lose whatever time IS left before it. If
             # there's enough room for a genuinely useful shorter session,
             # insert one instead of skipping straight to the window's end.
-            available_min = (overlap[0] - cursor).total_seconds() / 60
-            if available_min >= MIN_SHORT_SESSION_MIN:
+            short_end = _floor_5min(overlap[0])  # never later than the real prayer start
+            short_duration = (short_end - cursor).total_seconds() / 60
+            if short_duration >= MIN_SHORT_SESSION_MIN:
                 if pending_label:
                     gap_labels[len(blocks)] = pending_label
                     pending_label = None
-                blocks.append((cursor, overlap[0]))
+                blocks.append((cursor, short_end))
             pending_label = overlap[2]
-            cursor = overlap[1]  # jump past the blocked window, continue from there
+            cursor = _ceil_5min(overlap[1])  # resets the grid cleanly — never earlier than safe
             continue
         if block_end > day_end:
             break
@@ -1915,12 +1923,6 @@ def build_study_schedule(for_date: date) -> tuple[list[tuple[datetime, datetime]
             pending_label = None
         blocks.append((cursor, block_end))
         cursor = block_end + timedelta(minutes=break_min)
-
-    # Cosmetic pass: round displayed times to clean 5-minute marks. Start
-    # rounds UP (never earlier/less safe), end rounds DOWN (never later/
-    # less safe) — the prayer-safety math above is already done against
-    # the PRECISE times before this point, so this can't reopen a gap.
-    blocks = [(_ceil_5min(s), _floor_5min(e)) for s, e in blocks]
     return blocks, gap_labels
 
 
@@ -1941,7 +1943,6 @@ def render_schedule_message(sched: dict) -> str:
         label = gap_labels.get(i)
         if label:
             icon = "🕌" if "صلاة" in label else "📚"
-            lines.append("")
             lines.append(f"{icon} <i>{label}</i>")
             lines.append("")
         line = f"⏰ {start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')}"
@@ -1949,7 +1950,8 @@ def render_schedule_message(sched: dict) -> str:
             lines.append(f"✅ <s>{line}</s>")
         else:
             lines.append(line)
-    return "\n".join(lines)
+        lines.append("")  # a blank line after EVERY session, not just around gap labels
+    return "\n".join(lines).rstrip()
 
 
 STREAK_BREAK_THRESHOLD = 7  # only nudge for a streak that was actually meaningful

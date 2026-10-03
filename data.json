@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:14:17.714588",
+  "generated_at": "2026-10-03T15:14:40.133241",
   "exam_mode": false,
   "daily": [
     {
@@ -19,6 +19,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@W0M0Y",
+      "batch": "Med27",
+      "minutes": 15,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 18
     },
     {
       "name": "@Husain_Alsaati",
@@ -57,6 +66,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
+    },
+    {
+      "name": "@W0M0Y",
+      "batch": "Med27",
+      "minutes": 15,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 18
     }
   ],
   "monthly": [
@@ -86,6 +104,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
+    },
+    {
+      "name": "@W0M0Y",
+      "batch": "Med27",
+      "minutes": 15,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 18
     }
   ],
   "all_time": [
@@ -115,6 +142,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
+    },
+    {
+      "name": "@W0M0Y",
+      "batch": "Med27",
+      "minutes": 15,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 18
     }
   ],
   "weekly_by_batch": {
@@ -148,15 +184,28 @@
         "level_title": "🥉 برونزي",
         "xp": 427
       }
+    ],
+    "Med27": [
+      {
+        "name": "@W0M0Y",
+        "batch": "Med27",
+        "minutes": 15,
+        "founder": false,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 18
+      }
     ]
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 62.0
+    "Med26": 62.0,
+    "Med27": 0.5
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 868
+    "Med26": 868,
+    "Med27": 15
   },
   "hall_of_fame": [],
   "most_improved": {
@@ -168,6 +217,11 @@
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "streak": 2
+    },
+    {
+      "name": "@W0M0Y",
+      "batch": "Med27",
+      "streak": 1
     },
     {
       "name": "Miralita",

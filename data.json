@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-10-03T16:13:07.418324",
+  "generated_at": "2026-10-03T16:15:07.556292",
   "exam_mode": false,
   "daily": [
     {
       "name": "R La goat👨‍⚕️",
       "batch": "Med27",
-      "minutes": 840,
+      "minutes": 1380,
       "founder": false,
-      "level": 4,
+      "level": 5,
       "level_title": "🥈 فضي",
-      "xp": 843
+      "xp": 1383
     },
     {
       "name": "🐢",
@@ -158,6 +158,15 @@
   ],
   "weekly": [
     {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 1380,
+      "founder": false,
+      "level": 5,
+      "level_title": "🥈 فضي",
+      "xp": 1383
+    },
+    {
       "name": "Dr.Jana (Med27 Leader)",
       "batch": "Med27",
       "minutes": 932,
@@ -165,15 +174,6 @@
       "level": 4,
       "level_title": "🥈 فضي",
       "xp": 932
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 840,
-      "founder": false,
-      "level": 4,
-      "level_title": "🥈 فضي",
-      "xp": 843
     },
     {
       "name": "🐢",
@@ -322,6 +322,15 @@
   ],
   "monthly": [
     {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 1380,
+      "founder": false,
+      "level": 5,
+      "level_title": "🥈 فضي",
+      "xp": 1383
+    },
+    {
       "name": "Dr.Jana (Med27 Leader)",
       "batch": "Med27",
       "minutes": 932,
@@ -329,15 +338,6 @@
       "level": 4,
       "level_title": "🥈 فضي",
       "xp": 932
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 840,
-      "founder": false,
-      "level": 4,
-      "level_title": "🥈 فضي",
-      "xp": 843
     },
     {
       "name": "🐢",
@@ -486,6 +486,15 @@
   ],
   "all_time": [
     {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 1380,
+      "founder": false,
+      "level": 5,
+      "level_title": "🥈 فضي",
+      "xp": 1383
+    },
+    {
       "name": "Dr.Jana (Med27 Leader)",
       "batch": "Med27",
       "minutes": 932,
@@ -493,15 +502,6 @@
       "level": 4,
       "level_title": "🥈 فضي",
       "xp": 932
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 840,
-      "founder": false,
-      "level": 4,
-      "level_title": "🥈 فضي",
-      "xp": 843
     },
     {
       "name": "🐢",
@@ -727,6 +727,15 @@
     ],
     "Med27": [
       {
+        "name": "R La goat👨‍⚕️",
+        "batch": "Med27",
+        "minutes": 1380,
+        "founder": false,
+        "level": 5,
+        "level_title": "🥈 فضي",
+        "xp": 1383
+      },
+      {
         "name": "Dr.Jana (Med27 Leader)",
         "batch": "Med27",
         "minutes": 932,
@@ -734,15 +743,6 @@
         "level": 4,
         "level_title": "🥈 فضي",
         "xp": 932
-      },
-      {
-        "name": "R La goat👨‍⚕️",
-        "batch": "Med27",
-        "minutes": 840,
-        "founder": false,
-        "level": 4,
-        "level_title": "🥈 فضي",
-        "xp": 843
       },
       {
         "name": "🐢",
@@ -821,17 +821,17 @@
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 55.5,
-    "Med27": 103.3
+    "Med27": 116.1
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1221,
-    "Med27": 4337
+    "Med27": 4877
   },
   "hall_of_fame": [],
   "most_improved": {
-    "name": "Dr.Jana (Med27 Leader)",
-    "delta": 932
+    "name": "R La goat👨‍⚕️",
+    "delta": 1380
   },
   "top_streaks": [
     {

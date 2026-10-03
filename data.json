@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:24:09.600608",
+  "generated_at": "2026-10-03T15:25:06.724135",
   "exam_mode": false,
   "daily": [
     {
@@ -48,6 +48,15 @@
       "xp": 363
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 216,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 219
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -73,15 +82,6 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 113
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 96,
-      "founder": false,
-      "level": 2,
-      "level_title": "🥉 برونزي",
-      "xp": 99
     },
     {
       "name": "@DrrSultan",
@@ -176,6 +176,15 @@
       "xp": 363
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 216,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 219
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -201,15 +210,6 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 113
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 96,
-      "founder": false,
-      "level": 2,
-      "level_title": "🥉 برونزي",
-      "xp": 99
     },
     {
       "name": "@DrrSultan",
@@ -304,6 +304,15 @@
       "xp": 363
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 216,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 219
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -329,15 +338,6 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 113
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 96,
-      "founder": false,
-      "level": 2,
-      "level_title": "🥉 برونزي",
-      "xp": 99
     },
     {
       "name": "@DrrSultan",
@@ -432,6 +432,15 @@
       "xp": 363
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 216,
+      "founder": false,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 219
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -457,15 +466,6 @@
       "level": 2,
       "level_title": "🥉 برونزي",
       "xp": 113
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 96,
-      "founder": false,
-      "level": 2,
-      "level_title": "🥉 برونزي",
-      "xp": 99
     },
     {
       "name": "@DrrSultan",
@@ -610,6 +610,15 @@
         "xp": 363
       },
       {
+        "name": "🐢",
+        "batch": "Med27",
+        "minutes": 216,
+        "founder": false,
+        "level": 2,
+        "level_title": "🥉 برونزي",
+        "xp": 219
+      },
+      {
         "name": "@liu0an",
         "batch": "Med27",
         "minutes": 147,
@@ -617,15 +626,6 @@
         "level": 2,
         "level_title": "🥉 برونزي",
         "xp": 150
-      },
-      {
-        "name": "🐢",
-        "batch": "Med27",
-        "minutes": 96,
-        "founder": false,
-        "level": 2,
-        "level_title": "🥉 برونزي",
-        "xp": 99
       },
       {
         "name": "Abdullah (Med27 Leader)",
@@ -649,13 +649,13 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 70.6,
-    "Med27": 53.1
+    "Med26": 66.7,
+    "Med27": 56.8
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1201,
-    "Med27": 1699
+    "Med27": 1819
   },
   "hall_of_fame": [],
   "most_improved": {

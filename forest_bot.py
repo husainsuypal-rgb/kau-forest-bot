@@ -938,6 +938,19 @@ async def cmd_setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"✅ تم تحديث اسمك بالمتصدرين إلى: {name}")
 
 
+async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/testschedule — manager-only manual trigger for the daily study-
+    block schedule, instead of waiting for the automatic 00:05 post. Does
+    not interfere with tomorrow's automatic post — that still fires on
+    its own regardless."""
+    user = update.effective_user
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
+        return
+    await job_post_daily_schedule(context)
+    await update.message.reply_text("✅ تم نشر جدول اليوم يدويًا.")
+
+
 async def cmd_setschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/setschedule 13:00 22:00 — restricted to managers"""
     user = update.effective_user
@@ -1899,6 +1912,7 @@ def main():
     app.add_handler(CommandHandler("register", cmd_register))
     app.add_handler(CommandHandler("setname", cmd_setname))
     app.add_handler(CommandHandler("setschedule", cmd_setschedule))
+    app.add_handler(CommandHandler("testschedule", cmd_testschedule))
     app.add_handler(CommandHandler("exammode", cmd_exammode))
     app.add_handler(CommandHandler("findpartner", cmd_findpartner))
     app.add_handler(CommandHandler("log", cmd_log))

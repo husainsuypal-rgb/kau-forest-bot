@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:23:32.348208",
+  "generated_at": "2026-10-03T15:23:56.319103",
   "exam_mode": false,
   "daily": [
     {
@@ -118,6 +118,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 18
+    },
+    {
+      "name": "@DrSHatha1",
+      "batch": "Med26",
+      "minutes": 1,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 4
     }
   ],
   "weekly": [
@@ -237,6 +246,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 31
+    },
+    {
+      "name": "@DrSHatha1",
+      "batch": "Med26",
+      "minutes": 1,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 4
     }
   ],
   "monthly": [
@@ -356,6 +374,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 31
+    },
+    {
+      "name": "@DrSHatha1",
+      "batch": "Med26",
+      "minutes": 1,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 4
     }
   ],
   "all_time": [
@@ -475,6 +502,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 31
+    },
+    {
+      "name": "@DrSHatha1",
+      "batch": "Med26",
+      "minutes": 1,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 4
     }
   ],
   "weekly_by_batch": {
@@ -534,6 +570,15 @@
         "level": 1,
         "level_title": "🥉 برونزي",
         "xp": 49
+      },
+      {
+        "name": "@DrSHatha1",
+        "batch": "Med26",
+        "minutes": 1,
+        "founder": true,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 4
       }
     ],
     "Med27": [
@@ -609,7 +654,7 @@
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 1200,
+    "Med26": 1201,
     "Med27": 1673
   },
   "hall_of_fame": [],
@@ -654,8 +699,8 @@
       "streak": 1
     },
     {
-      "name": "Julia",
-      "batch": "Med27",
+      "name": "@DrSHatha1",
+      "batch": "Med26",
       "streak": 1
     }
   ]

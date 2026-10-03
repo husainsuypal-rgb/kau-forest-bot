@@ -285,6 +285,48 @@ def init_db():
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS college_hours (
+            weekday INTEGER PRIMARY KEY,
+            start_time TEXT,
+            end_time TEXT
+        )
+        """
+    )
+    conn.commit()
+    conn.close()
+
+
+WEEKDAY_NAMES = {
+    "monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3,
+    "friday": 4, "saturday": 5, "sunday": 6,
+}
+WEEKDAY_NAMES_AR = ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"]
+
+
+def get_college_hours(weekday: int):
+    """Recurring weekly college-hours window for this weekday, or None if
+    not set. Weekly (not daily) because university timetables repeat by
+    weekday, not change every single day — set once, applies every week."""
+    conn = db()
+    row = conn.execute(
+        "SELECT start_time, end_time FROM college_hours WHERE weekday=?", (weekday,)
+    ).fetchone()
+    conn.close()
+    return (row["start_time"], row["end_time"]) if row else None
+
+
+def set_college_hours(weekday: int, start_time: str | None, end_time: str | None):
+    conn = db()
+    if start_time is None:
+        conn.execute("DELETE FROM college_hours WHERE weekday=?", (weekday,))
+    else:
+        conn.execute(
+            "INSERT INTO college_hours (weekday, start_time, end_time) VALUES (?, ?, ?) "
+            "ON CONFLICT(weekday) DO UPDATE SET start_time=excluded.start_time, end_time=excluded.end_time",
+            (weekday, start_time, end_time),
+        )
     conn.commit()
     conn.close()
 
@@ -936,6 +978,53 @@ async def cmd_setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = " ".join(args)
     set_display_name(user.id, name)
     await update.message.reply_text(f"✅ تم تحديث اسمك بالمتصدرين إلى: {name}")
+
+
+async def cmd_setcollegehours(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/setcollegehours Sunday 08:00 14:00 — manager-only. Sets a
+    recurring weekly window to exclude from that weekday's study
+    schedule, since class timetables repeat by weekday rather than
+    changing daily. /setcollegehours Sunday off clears a day."""
+    user = update.effective_user
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        await update.message.reply_text("هذا الأمر مخصص للمنظّمين فقط.")
+        return
+    args = context.args
+    if len(args) < 2:
+        await update.message.reply_text(
+            "استخدم: /setcollegehours Sunday 08:00 14:00\n"
+            "أو: /setcollegehours Sunday off  (لإلغاء يوم معيّن)\n"
+            "الأيام: Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+        )
+        return
+    day_name = args[0].lower()
+    if day_name not in WEEKDAY_NAMES:
+        await update.message.reply_text("اسم اليوم غلط. استخدم: Sunday, Monday, ... Saturday")
+        return
+    weekday = WEEKDAY_NAMES[day_name]
+    day_ar = WEEKDAY_NAMES_AR[weekday]
+
+    if args[1].lower() == "off":
+        set_college_hours(weekday, None, None)
+        await update.message.reply_text(f"✅ شيلنا استثناء الكلية ليوم {day_ar}.")
+        return
+
+    if len(args) != 3:
+        await update.message.reply_text("استخدم: /setcollegehours Sunday 08:00 14:00")
+        return
+    start, end = args[1], args[2]
+    try:
+        sh, sm = map(int, start.split(":"))
+        eh, em = map(int, end.split(":"))
+        assert 0 <= sh < 24 and 0 <= sm < 60 and 0 <= eh < 24 and 0 <= em < 60
+    except Exception:
+        await update.message.reply_text("صيغة الوقت غلط. استخدم HH:MM مثل 08:00")
+        return
+
+    set_college_hours(weekday, start, end)
+    await update.message.reply_text(
+        f"✅ من الحين، جدول يوم {day_ar} بيتجنّب فترة الكلية من {start} إلى {end} تلقائيًا كل أسبوع."
+    )
 
 
 async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1619,6 +1708,17 @@ def build_study_schedule(for_date: date) -> list[tuple[datetime, datetime]]:
                 t - timedelta(minutes=PRAYER_BUFFER_BEFORE_MIN),
                 t + timedelta(minutes=after),
             ))
+
+    college = get_college_hours(for_date.weekday())
+    if college:
+        start_str, end_str = college
+        sh, sm = map(int, start_str.split(":"))
+        eh, em = map(int, end_str.split(":"))
+        blocked.append((
+            datetime.combine(for_date, dtime(hour=sh, minute=sm)),
+            datetime.combine(for_date, dtime(hour=eh, minute=em)),
+        ))
+
     blocked.sort()
 
     is_weekend = for_date.weekday() in (4, 5)  # Friday, Saturday
@@ -1913,6 +2013,7 @@ def main():
     app.add_handler(CommandHandler("setname", cmd_setname))
     app.add_handler(CommandHandler("setschedule", cmd_setschedule))
     app.add_handler(CommandHandler("testschedule", cmd_testschedule))
+    app.add_handler(CommandHandler("setcollegehours", cmd_setcollegehours))
     app.add_handler(CommandHandler("exammode", cmd_exammode))
     app.add_handler(CommandHandler("findpartner", cmd_findpartner))
     app.add_handler(CommandHandler("log", cmd_log))

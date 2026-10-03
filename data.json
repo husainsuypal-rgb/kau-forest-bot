@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T14:35:49.401346",
+  "generated_at": "2026-10-03T15:05:49.401377",
   "exam_mode": false,
   "daily": [
     {
@@ -59,7 +59,7 @@
     ]
   },
   "weekly_batch_averages": {
-    "Med25": 36.0
+    "Med25": 18.0
   },
   "weekly_batch_totals": {
     "Med25": 36

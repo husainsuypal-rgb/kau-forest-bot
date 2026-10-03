@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:22:44.838832",
+  "generated_at": "2026-10-03T15:23:00.256767",
   "exam_mode": false,
   "daily": [
     {
@@ -37,6 +37,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 423
+    },
+    {
+      "name": "@DrJoudirbreo",
+      "batch": "Med27",
+      "minutes": 360,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 363
     },
     {
       "name": "Yara",
@@ -140,6 +149,15 @@
       "xp": 423
     },
     {
+      "name": "@DrJoudirbreo",
+      "batch": "Med27",
+      "minutes": 360,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 363
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -241,6 +259,15 @@
       "xp": 423
     },
     {
+      "name": "@DrJoudirbreo",
+      "batch": "Med27",
+      "minutes": 360,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 363
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -340,6 +367,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 423
+    },
+    {
+      "name": "@DrJoudirbreo",
+      "batch": "Med27",
+      "minutes": 360,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 363
     },
     {
       "name": "Yara",
@@ -475,6 +511,15 @@
         "xp": 427
       },
       {
+        "name": "@DrJoudirbreo",
+        "batch": "Med27",
+        "minutes": 360,
+        "founder": false,
+        "level": 3,
+        "level_title": "🥉 برونزي",
+        "xp": 363
+      },
+      {
         "name": "@liu0an",
         "batch": "Med27",
         "minutes": 147,
@@ -515,12 +560,12 @@
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 64.1,
-    "Med27": 40.6
+    "Med27": 51.8
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1090,
-    "Med27": 1299
+    "Med27": 1659
   },
   "hall_of_fame": [],
   "most_improved": {

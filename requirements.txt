@@ -2,3 +2,4 @@ python-telegram-bot[job-queue]==21.6
 pillow==10.4.0
 pytesseract==0.3.13
 requests==2.32.3
+websockets==13.1

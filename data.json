@@ -1,7 +1,16 @@
 {
-  "generated_at": "2026-10-03T16:12:23.637758",
+  "generated_at": "2026-10-03T16:13:07.418324",
   "exam_mode": false,
   "daily": [
+    {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 840,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 843
+    },
     {
       "name": "🐢",
       "batch": "Med27",
@@ -64,15 +73,6 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 363
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 240,
-      "founder": false,
-      "level": 3,
-      "level_title": "🥉 برونزي",
-      "xp": 243
     },
     {
       "name": "Yara",
@@ -167,6 +167,15 @@
       "xp": 932
     },
     {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 840,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 843
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 612,
@@ -228,15 +237,6 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 363
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 240,
-      "founder": false,
-      "level": 3,
-      "level_title": "🥉 برونزي",
-      "xp": 243
     },
     {
       "name": "Yara",
@@ -331,6 +331,15 @@
       "xp": 932
     },
     {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 840,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 843
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 612,
@@ -392,15 +401,6 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 363
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 240,
-      "founder": false,
-      "level": 3,
-      "level_title": "🥉 برونزي",
-      "xp": 243
     },
     {
       "name": "Yara",
@@ -495,6 +495,15 @@
       "xp": 932
     },
     {
+      "name": "R La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 840,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 843
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 612,
@@ -556,15 +565,6 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 363
-    },
-    {
-      "name": "R La goat👨‍⚕️",
-      "batch": "Med27",
-      "minutes": 240,
-      "founder": false,
-      "level": 3,
-      "level_title": "🥉 برونزي",
-      "xp": 243
     },
     {
       "name": "Yara",
@@ -736,6 +736,15 @@
         "xp": 932
       },
       {
+        "name": "R La goat👨‍⚕️",
+        "batch": "Med27",
+        "minutes": 840,
+        "founder": false,
+        "level": 4,
+        "level_title": "🥈 فضي",
+        "xp": 843
+      },
+      {
         "name": "🐢",
         "batch": "Med27",
         "minutes": 612,
@@ -781,15 +790,6 @@
         "xp": 363
       },
       {
-        "name": "R La goat👨‍⚕️",
-        "batch": "Med27",
-        "minutes": 240,
-        "founder": false,
-        "level": 3,
-        "level_title": "🥉 برونزي",
-        "xp": 243
-      },
-      {
         "name": "@liu0an",
         "batch": "Med27",
         "minutes": 147,
@@ -821,12 +821,12 @@
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 55.5,
-    "Med27": 89.0
+    "Med27": 103.3
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1221,
-    "Med27": 3737
+    "Med27": 4337
   },
   "hall_of_fame": [],
   "most_improved": {

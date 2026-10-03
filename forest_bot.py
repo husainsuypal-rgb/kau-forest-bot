@@ -1682,8 +1682,7 @@ async def job_post_daily_schedule(context: ContextTypes.DEFAULT_TYPE):
     lines = [
         "🌲 *جدول المذاكرة الجماعي اليوم*",
         "",
-        "أي فترة، اللي يذاكر وقتها يسوي Plant Together بتطبيق Forest ويبعث رابط الانضمام هنا 🔗",
-        "ما فيه حد معيّن مسؤول — أول وحد متاح يسوي الجلسة",
+        "أي فترة، اللي يذاكر وقتها من الأدمنز يسوي Plant Together بتطبيق Forest ويبعث رابط الانضمام هنا 🔗",
         "",
     ]
     for start, end in blocks:
@@ -1741,7 +1740,7 @@ async def job_check_schedule_pings(context: ContextTypes.DEFAULT_TYPE):
                 chat_id=GROUP_CHAT_ID,
                 text=(
                     f"⏰ بدأت فترة مذاكرة ({start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')})\n"
-                    "اللي يذاكر الحين، سوّي Plant Together بـ Forest وابعث الرابط 🌲"
+                    "من الأدمنز الحين؟ سوّي Plant Together بـ Forest وابعث الرابط 🌲"
                 ),
                 **_topic_kwargs(TOPIC_SESSIONS_ID),
             )

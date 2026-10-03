@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:21:44.686710",
+  "generated_at": "2026-10-03T15:22:01.470620",
   "exam_mode": false,
   "daily": [
     {
@@ -59,11 +59,11 @@
     {
       "name": "🐢",
       "batch": "Med27",
-      "minutes": 29,
+      "minutes": 43,
       "founder": false,
       "level": 1,
       "level_title": "🥉 برونزي",
-      "xp": 32
+      "xp": 46
     },
     {
       "name": "@iamjuwana",
@@ -140,6 +140,15 @@
       "xp": 49
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 43,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 46
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -147,15 +156,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 29,
-      "founder": false,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 32
     },
     {
       "name": "@iamjuwana",
@@ -223,6 +223,15 @@
       "xp": 49
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 43,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 46
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -230,15 +239,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 29,
-      "founder": false,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 32
     },
     {
       "name": "@iamjuwana",
@@ -306,6 +306,15 @@
       "xp": 49
     },
     {
+      "name": "🐢",
+      "batch": "Med27",
+      "minutes": 43,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 46
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -313,15 +322,6 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
-    },
-    {
-      "name": "🐢",
-      "batch": "Med27",
-      "minutes": 29,
-      "founder": false,
-      "level": 1,
-      "level_title": "🥉 برونزي",
-      "xp": 32
     },
     {
       "name": "@iamjuwana",
@@ -405,11 +405,11 @@
       {
         "name": "🐢",
         "batch": "Med27",
-        "minutes": 29,
+        "minutes": 43,
         "founder": false,
         "level": 1,
         "level_title": "🥉 برونزي",
-        "xp": 32
+        "xp": 46
       },
       {
         "name": "@iamjuwana",
@@ -425,12 +425,12 @@
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 84.1,
-    "Med27": 22.7
+    "Med27": 23.1
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1514,
-    "Med27": 657
+    "Med27": 671
   },
   "hall_of_fame": [],
   "most_improved": {

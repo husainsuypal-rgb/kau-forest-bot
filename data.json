@@ -1,7 +1,16 @@
 {
-  "generated_at": "2026-10-03T15:15:36.871493",
+  "generated_at": "2026-10-03T15:18:50.543920",
   "exam_mode": false,
   "daily": [
+    {
+      "name": "La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 600,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 603
+    },
     {
       "name": "Miralita",
       "batch": "Med26",
@@ -12,7 +21,7 @@
       "xp": 447
     },
     {
-      "name": "Julia",
+      "name": "J•A",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -30,7 +39,7 @@
       "xp": 49
     },
     {
-      "name": "@W0M0Y",
+      "name": "🐢",
       "batch": "Med27",
       "minutes": 15,
       "founder": false,
@@ -50,6 +59,15 @@
   ],
   "weekly": [
     {
+      "name": "La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 600,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 603
+    },
+    {
       "name": "Miralita",
       "batch": "Med26",
       "minutes": 444,
@@ -59,7 +77,7 @@
       "xp": 447
     },
     {
-      "name": "Julia",
+      "name": "J•A",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -86,7 +104,7 @@
       "xp": 42
     },
     {
-      "name": "@W0M0Y",
+      "name": "🐢",
       "batch": "Med27",
       "minutes": 15,
       "founder": false,
@@ -97,6 +115,15 @@
   ],
   "monthly": [
     {
+      "name": "La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 600,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 603
+    },
+    {
       "name": "Miralita",
       "batch": "Med26",
       "minutes": 444,
@@ -106,7 +133,7 @@
       "xp": 447
     },
     {
-      "name": "Julia",
+      "name": "J•A",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -133,7 +160,7 @@
       "xp": 42
     },
     {
-      "name": "@W0M0Y",
+      "name": "🐢",
       "batch": "Med27",
       "minutes": 15,
       "founder": false,
@@ -144,6 +171,15 @@
   ],
   "all_time": [
     {
+      "name": "La goat👨‍⚕️",
+      "batch": "Med27",
+      "minutes": 600,
+      "founder": false,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 603
+    },
+    {
       "name": "Miralita",
       "batch": "Med26",
       "minutes": 444,
@@ -153,7 +189,7 @@
       "xp": 447
     },
     {
-      "name": "Julia",
+      "name": "J•A",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -180,7 +216,7 @@
       "xp": 42
     },
     {
-      "name": "@W0M0Y",
+      "name": "🐢",
       "batch": "Med27",
       "minutes": 15,
       "founder": false,
@@ -212,7 +248,7 @@
         "xp": 447
       },
       {
-        "name": "Julia",
+        "name": "J•A",
         "batch": "Med26",
         "minutes": 424,
         "founder": true,
@@ -232,7 +268,16 @@
     ],
     "Med27": [
       {
-        "name": "@W0M0Y",
+        "name": "La goat👨‍⚕️",
+        "batch": "Med27",
+        "minutes": 600,
+        "founder": false,
+        "level": 4,
+        "level_title": "🥈 فضي",
+        "xp": 603
+      },
+      {
+        "name": "🐢",
         "batch": "Med27",
         "minutes": 15,
         "founder": false,
@@ -244,18 +289,18 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 65.3,
-    "Med27": 0.5
+    "Med26": 53.8,
+    "Med27": 22.0
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 914,
-    "Med27": 15
+    "Med27": 615
   },
   "hall_of_fame": [],
   "most_improved": {
-    "name": "Miralita",
-    "delta": 444
+    "name": "La goat👨‍⚕️",
+    "delta": 600
   },
   "top_streaks": [
     {
@@ -264,7 +309,7 @@
       "streak": 2
     },
     {
-      "name": "@W0M0Y",
+      "name": "🐢",
       "batch": "Med27",
       "streak": 1
     },
@@ -279,8 +324,13 @@
       "streak": 1
     },
     {
-      "name": "Julia",
+      "name": "J•A",
       "batch": "Med26",
+      "streak": 1
+    },
+    {
+      "name": "La goat👨‍⚕️",
+      "batch": "Med27",
       "streak": 1
     }
   ]

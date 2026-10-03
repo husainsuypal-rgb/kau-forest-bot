@@ -27,6 +27,7 @@ screenshots are now the only way to log a session.
 """
 
 import os
+import re
 import sqlite3
 import base64
 import json
@@ -1041,12 +1042,30 @@ async def cmd_setcollegehours(update: Update, context: ContextTypes.DEFAULT_TYPE
 DONE_KEYWORDS = {"تم", "تمت", "خلص", "خلصت", "done", "Done", "DONE"}
 
 
+async def _refresh_pinned_schedule(context):
+    """Re-renders and re-saves the pinned schedule message in place —
+    shared by the manual 'تم' handler and the automatic link-based
+    completion job below, so both stay in sync the same way."""
+    sched = context.application.bot_data.get("today_schedule")
+    msg_id = context.application.bot_data.get("pinned_schedule_message_id")
+    if not sched or not msg_id or not GROUP_CHAT_ID:
+        return
+    try:
+        await context.bot.edit_message_text(
+            chat_id=GROUP_CHAT_ID,
+            message_id=msg_id,
+            text=render_schedule_message(sched),
+            parse_mode="HTML",
+        )
+    except Exception:
+        logger.exception("Failed to edit the pinned schedule message")
+
+
 async def handle_session_done(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """A manager typing 'تم' (or a few variants) in the sessions topic
-    marks the most recently started, not-yet-completed study block as
-    done — editing the pinned schedule message in place with a checkmark
-    + strikethrough, rather than posting a new message each time.
-    Manager-only, and only inside the sessions topic specifically."""
+    manually marks the most recently started, not-yet-completed study
+    block as done. Manager-only, sessions topic only. This is the manual
+    path — see job_auto_complete_sessions below for the automatic one."""
     user = update.effective_user
     if not update.message or not update.message.text:
         return
@@ -1071,19 +1090,59 @@ async def handle_session_done(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
     start, end = max(candidates, key=lambda b: b[0])
     done_set.add(start.isoformat())
+    await _refresh_pinned_schedule(context)
 
-    msg_id = context.application.bot_data.get("pinned_schedule_message_id")
-    if not msg_id or not GROUP_CHAT_ID:
+
+_URL_PATTERN = re.compile(r"https?://\S+")
+
+
+async def handle_session_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """A manager posting any link in the sessions topic, during a
+    currently-active block's time window, marks that block as
+    'link_sent' — the signal job_auto_complete_sessions uses below to
+    auto-checkmark it once the block's time ends, without anyone having
+    to type 'تم' manually. If a link went out, someone almost certainly
+    joined; no need to make an admin confirm that by hand too."""
+    user = update.effective_user
+    if not update.message or not update.message.text:
         return
-    try:
-        await context.bot.edit_message_text(
-            chat_id=GROUP_CHAT_ID,
-            message_id=msg_id,
-            text=render_schedule_message(sched),
-            parse_mode="HTML",
-        )
-    except Exception:
-        logger.exception("Failed to edit the pinned schedule message after a 'done' mark")
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        return
+    if not _URL_PATTERN.search(update.message.text):
+        return
+    if TOPIC_SESSIONS_ID and str(getattr(update.message, "message_thread_id", "")) != str(TOPIC_SESSIONS_ID):
+        return
+
+    sched = context.application.bot_data.get("today_schedule")
+    if not sched or sched["date"] != local_today().isoformat():
+        return
+
+    now = local_now()
+    active = next((b for b in sched["blocks"] if b[0] <= now < b[1]), None)
+    if not active:
+        return
+    sched.setdefault("link_sent", set()).add(active[0].isoformat())
+
+
+async def job_auto_complete_sessions(context: ContextTypes.DEFAULT_TYPE):
+    """Runs every 5 minutes alongside the ping job: any block whose time
+    just ended, that had a link sent during it, and isn't already marked
+    done, gets auto-checkmarked — no manual 'تم' needed for the common
+    case where a link genuinely went out."""
+    sched = context.application.bot_data.get("today_schedule")
+    if not sched or sched["date"] != local_today().isoformat():
+        return
+    now = local_now()
+    link_sent = sched.get("link_sent", set())
+    done_set = sched.setdefault("done", set())
+    changed = False
+    for start, end in sched["blocks"]:
+        key = start.isoformat()
+        if end <= now < end + timedelta(minutes=5) and key in link_sent and key not in done_set:
+            done_set.add(key)
+            changed = True
+    if changed:
+        await _refresh_pinned_schedule(context)
 
 
 async def cmd_checkschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2290,6 +2349,10 @@ def main():
     app.add_handler(CommandHandler("leaderboard", cmd_leaderboard))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_session_done))
+    # group=1: both this and the "تم" handler above match the same TEXT
+    # filter, and a single group only runs the first match by default —
+    # a different group makes BOTH actually process every text message.
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_session_link), group=1)
     app.add_handler(CallbackQueryHandler(handle_callback))
 
     # Schedule automated posts (times are local per TZ_OFFSET_HOURS, expressed as UTC here)
@@ -2322,6 +2385,7 @@ def main():
     jq.run_daily(job_check_streak_breaks, time=dtime(hour=(0 - TZ_OFFSET_HOURS) % 24, minute=15))
     # Check every 5 minutes whether a scheduled block just started
     jq.run_repeating(job_check_schedule_pings, interval=300, first=30)
+    jq.run_repeating(job_auto_complete_sessions, interval=300, first=45)
 
     logger.info("Bot starting...")
     app.run_polling()

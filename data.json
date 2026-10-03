@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:18:53.261740",
+  "generated_at": "2026-10-03T15:18:59.899773",
   "exam_mode": false,
   "daily": [
     {
@@ -28,6 +28,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "Yara",
+      "batch": "Med26",
+      "minutes": 180,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 183
     },
     {
       "name": "@DrrSultan",
@@ -86,6 +95,15 @@
       "xp": 427
     },
     {
+      "name": "Yara",
+      "batch": "Med26",
+      "minutes": 180,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 183
+    },
+    {
       "name": "@DrrSultan",
       "batch": "Med26",
       "minutes": 46,
@@ -142,6 +160,15 @@
       "xp": 427
     },
     {
+      "name": "Yara",
+      "batch": "Med26",
+      "minutes": 180,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 183
+    },
+    {
       "name": "@DrrSultan",
       "batch": "Med26",
       "minutes": 46,
@@ -196,6 +223,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "Yara",
+      "batch": "Med26",
+      "minutes": 180,
+      "founder": true,
+      "level": 2,
+      "level_title": "🥉 برونزي",
+      "xp": 183
     },
     {
       "name": "@DrrSultan",
@@ -257,6 +293,15 @@
         "xp": 427
       },
       {
+        "name": "Yara",
+        "batch": "Med26",
+        "minutes": 180,
+        "founder": true,
+        "level": 2,
+        "level_title": "🥉 برونزي",
+        "xp": 183
+      },
+      {
         "name": "@DrrSultan",
         "batch": "Med26",
         "minutes": 46,
@@ -289,12 +334,12 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 53.8,
+    "Med26": 64.4,
     "Med27": 22.0
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 914,
+    "Med26": 1094,
     "Med27": 615
   },
   "hall_of_fame": [],
@@ -307,6 +352,11 @@
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "streak": 2
+    },
+    {
+      "name": "Yara",
+      "batch": "Med26",
+      "streak": 1
     },
     {
       "name": "🐢",

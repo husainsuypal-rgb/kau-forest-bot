@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-03T15:18:59.899773",
+  "generated_at": "2026-10-03T15:21:11.020644",
   "exam_mode": false,
   "daily": [
     {
-      "name": "La goat👨‍⚕️",
+      "name": "La goat 👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -21,7 +21,7 @@
       "xp": 447
     },
     {
-      "name": "J•A",
+      "name": "Julia",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -46,6 +46,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 49
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 28,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 31
     },
     {
       "name": "🐢",
@@ -68,7 +77,7 @@
   ],
   "weekly": [
     {
-      "name": "La goat👨‍⚕️",
+      "name": "La goat 👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -86,7 +95,7 @@
       "xp": 447
     },
     {
-      "name": "J•A",
+      "name": "Julia",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -120,6 +129,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 28,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 31
     },
     {
       "name": "🐢",
@@ -133,7 +151,7 @@
   ],
   "monthly": [
     {
-      "name": "La goat👨‍⚕️",
+      "name": "La goat 👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -151,7 +169,7 @@
       "xp": 447
     },
     {
-      "name": "J•A",
+      "name": "Julia",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -185,6 +203,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 28,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 31
     },
     {
       "name": "🐢",
@@ -198,7 +225,7 @@
   ],
   "all_time": [
     {
-      "name": "La goat👨‍⚕️",
+      "name": "La goat 👨‍⚕️",
       "batch": "Med27",
       "minutes": 600,
       "founder": false,
@@ -216,7 +243,7 @@
       "xp": 447
     },
     {
-      "name": "J•A",
+      "name": "Julia",
       "batch": "Med26",
       "minutes": 424,
       "founder": true,
@@ -250,6 +277,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 42
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
+      "minutes": 28,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 31
     },
     {
       "name": "🐢",
@@ -284,7 +320,7 @@
         "xp": 447
       },
       {
-        "name": "J•A",
+        "name": "Julia",
         "batch": "Med26",
         "minutes": 424,
         "founder": true,
@@ -313,13 +349,22 @@
     ],
     "Med27": [
       {
-        "name": "La goat👨‍⚕️",
+        "name": "La goat 👨‍⚕️",
         "batch": "Med27",
         "minutes": 600,
         "founder": false,
         "level": 4,
         "level_title": "🥈 فضي",
         "xp": 603
+      },
+      {
+        "name": "@iamjuwana",
+        "batch": "Med27",
+        "minutes": 28,
+        "founder": true,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 31
       },
       {
         "name": "🐢",
@@ -334,17 +379,17 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 64.4,
-    "Med27": 22.0
+    "Med26": 60.8,
+    "Med27": 22.2
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1094,
-    "Med27": 615
+    "Med27": 643
   },
   "hall_of_fame": [],
   "most_improved": {
-    "name": "La goat👨‍⚕️",
+    "name": "La goat 👨‍⚕️",
     "delta": 600
   },
   "top_streaks": [
@@ -356,6 +401,11 @@
     {
       "name": "Yara",
       "batch": "Med26",
+      "streak": 1
+    },
+    {
+      "name": "@iamjuwana",
+      "batch": "Med27",
       "streak": 1
     },
     {
@@ -374,12 +424,12 @@
       "streak": 1
     },
     {
-      "name": "J•A",
+      "name": "Julia",
       "batch": "Med26",
       "streak": 1
     },
     {
-      "name": "La goat👨‍⚕️",
+      "name": "La goat 👨‍⚕️",
       "batch": "Med27",
       "streak": 1
     }

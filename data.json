@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:27:31.090824",
+  "generated_at": "2026-10-03T15:35:49.406085",
   "exam_mode": false,
   "daily": [
     {
@@ -111,7 +111,7 @@
       "xp": 31
     },
     {
-      "name": "@aser67676767",
+      "name": "Awfa",
       "batch": "Med26",
       "minutes": 20,
       "founder": false,
@@ -257,7 +257,7 @@
       "xp": 31
     },
     {
-      "name": "@aser67676767",
+      "name": "Awfa",
       "batch": "Med26",
       "minutes": 20,
       "founder": false,
@@ -394,7 +394,7 @@
       "xp": 31
     },
     {
-      "name": "@aser67676767",
+      "name": "Awfa",
       "batch": "Med26",
       "minutes": 20,
       "founder": false,
@@ -531,7 +531,7 @@
       "xp": 31
     },
     {
-      "name": "@aser67676767",
+      "name": "Awfa",
       "batch": "Med26",
       "minutes": 20,
       "founder": false,
@@ -608,7 +608,7 @@
         "xp": 49
       },
       {
-        "name": "@aser67676767",
+        "name": "Awfa",
         "batch": "Med26",
         "minutes": 20,
         "founder": false,
@@ -694,8 +694,8 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 64.3,
-    "Med27": 67.1
+    "Med26": 58.1,
+    "Med27": 63.3
   },
   "weekly_batch_totals": {
     "Med25": 36,
@@ -719,7 +719,7 @@
       "streak": 1
     },
     {
-      "name": "@aser67676767",
+      "name": "Awfa",
       "batch": "Med26",
       "streak": 1
     },

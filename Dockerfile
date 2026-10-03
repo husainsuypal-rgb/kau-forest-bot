@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+# Cache-bust marker: 2026-10-03-v2 — bumping this forces Docker to
+# re-run every layer below instead of reusing a stale cached COPY,
+# which is the usual fix when pushed code changes aren't actually
+# showing up in the running container despite a "successful" deploy.
 COPY . .
 
 CMD ["python", "forest_bot.py"]

@@ -1085,6 +1085,15 @@ async def handle_session_done(update: Update, context: ContextTypes.DEFAULT_TYPE
         logger.exception("Failed to edit the pinned schedule message after a 'done' mark")
 
 
+async def cmd_checkschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/checkschedule — identical to /testschedule, under a different name.
+    Exists purely as a deployment diagnostic: if this shows the new
+    labeled/spaced format while /testschedule still doesn't, that proves
+    the new code IS live and something specific to the old command/old
+    cached message is the problem — not a stuck deployment."""
+    await cmd_testschedule(update, context)
+
+
 async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/testschedule — manager-only manual trigger for the daily study-
     block schedule, instead of waiting for the automatic 00:05 post. Does
@@ -2144,6 +2153,7 @@ def main():
     app.add_handler(CommandHandler("setname", cmd_setname))
     app.add_handler(CommandHandler("setschedule", cmd_setschedule))
     app.add_handler(CommandHandler("testschedule", cmd_testschedule))
+    app.add_handler(CommandHandler("checkschedule", cmd_checkschedule))
     app.add_handler(CommandHandler("setcollegehours", cmd_setcollegehours))
     app.add_handler(CommandHandler("exammode", cmd_exammode))
     app.add_handler(CommandHandler("findpartner", cmd_findpartner))

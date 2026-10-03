@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:58:39.807486",
+  "generated_at": "2026-10-03T15:58:49.989114",
   "exam_mode": false,
   "daily": [
     {
@@ -127,6 +127,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 23
+    },
+    {
+      "name": "Mayar",
+      "batch": "Med27",
+      "minutes": 18,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 21
     },
     {
       "name": "@Husain_Alsaati",
@@ -293,6 +302,15 @@
       "xp": 23
     },
     {
+      "name": "Mayar",
+      "batch": "Med27",
+      "minutes": 18,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 21
+    },
+    {
       "name": "@DrSHatha1",
       "batch": "Med26",
       "minutes": 1,
@@ -448,6 +466,15 @@
       "xp": 23
     },
     {
+      "name": "Mayar",
+      "batch": "Med27",
+      "minutes": 18,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 21
+    },
+    {
       "name": "@DrSHatha1",
       "batch": "Med26",
       "minutes": 1,
@@ -601,6 +628,15 @@
       "level": 1,
       "level_title": "🥉 برونزي",
       "xp": 23
+    },
+    {
+      "name": "Mayar",
+      "batch": "Med27",
+      "minutes": 18,
+      "founder": false,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 21
     },
     {
       "name": "@DrSHatha1",
@@ -770,18 +806,27 @@
         "level": 1,
         "level_title": "🥉 برونزي",
         "xp": 47
+      },
+      {
+        "name": "Mayar",
+        "batch": "Med27",
+        "minutes": 18,
+        "founder": false,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 21
       }
     ]
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
     "Med26": 58.1,
-    "Med27": 99.5
+    "Med27": 99.9
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1221,
-    "Med27": 4079
+    "Med27": 4097
   },
   "hall_of_fame": [],
   "most_improved": {

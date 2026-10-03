@@ -908,7 +908,7 @@ async def cmd_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     batch = args[0]
     is_founder = register_user(user.id, default_display_name(user), batch)
     founder_line = (
-        f"\n🏅 أنت من أوائل المؤسسين في {batch} — راح يظهر وسمك دايمًا!"
+        f"\n🏅 أنت من أوائل روّاد {batch} — راح يظهر وسمك دايمًا!"
         if is_founder
         else ""
     )
@@ -1295,7 +1295,7 @@ async def _ocr_and_prepare(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if is_before_launch():
         await update.message.reply_text(
-            f"📚 التسجيل الرسمي يبدأ {LAUNCH_DATE} — سجّل دفعتك الحين لأخذ وسم المؤسس 🏅، "
+            f"📚 التسجيل الرسمي يبدأ {LAUNCH_DATE} — سجّل دفعتك الحين لأخذ وسم رائد الغابة 🏅، "
             "وارجع تصوّر جلساتك من يوم الإطلاق."
         )
         return None
@@ -1476,7 +1476,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_founder = register_user(user.id, default_display_name(user), batch)
         minutes = context.user_data.get("pending_minutes")
         source = context.user_data.get("pending_source", "session")
-        founder_line = f"\n🏅 وأنت من أوائل مؤسسي {batch}!" if is_founder else ""
+        founder_line = f"\n🏅 وأنت من أوائل روّاد {batch}!" if is_founder else ""
         setname_hint = "\nℹ️ تقدر تغيّر اسمك بالمتصدرين بالأمر /setname"
         if minutes is None:
             await query.edit_message_text(

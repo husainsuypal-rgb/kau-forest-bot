@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:35:49.406085",
+  "generated_at": "2026-10-03T15:39:54.297394",
   "exam_mode": false,
   "daily": [
     {
@@ -140,6 +140,15 @@
   ],
   "weekly": [
     {
+      "name": "Dr.Jana (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 932,
+      "founder": true,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 932
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 612,
@@ -277,6 +286,15 @@
   ],
   "monthly": [
     {
+      "name": "Dr.Jana (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 932,
+      "founder": true,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 932
+    },
+    {
       "name": "🐢",
       "batch": "Med27",
       "minutes": 612,
@@ -413,6 +431,15 @@
     }
   ],
   "all_time": [
+    {
+      "name": "Dr.Jana (Med27 Leader)",
+      "batch": "Med27",
+      "minutes": 932,
+      "founder": true,
+      "level": 4,
+      "level_title": "🥈 فضي",
+      "xp": 932
+    },
     {
       "name": "🐢",
       "batch": "Med27",
@@ -628,6 +655,15 @@
     ],
     "Med27": [
       {
+        "name": "Dr.Jana (Med27 Leader)",
+        "batch": "Med27",
+        "minutes": 932,
+        "founder": true,
+        "level": 4,
+        "level_title": "🥈 فضي",
+        "xp": 932
+      },
+      {
         "name": "🐢",
         "batch": "Med27",
         "minutes": 612,
@@ -694,18 +730,18 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 58.1,
-    "Med27": 63.3
+    "Med26": 61.0,
+    "Med27": 82.8
   },
   "weekly_batch_totals": {
     "Med25": 36,
     "Med26": 1221,
-    "Med27": 2215
+    "Med27": 3147
   },
   "hall_of_fame": [],
   "most_improved": {
-    "name": "🐢",
-    "delta": 612
+    "name": "Dr.Jana (Med27 Leader)",
+    "delta": 932
   },
   "top_streaks": [
     {

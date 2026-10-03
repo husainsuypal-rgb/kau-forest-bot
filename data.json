@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:14:40.133241",
+  "generated_at": "2026-10-03T15:15:36.871493",
   "exam_mode": false,
   "daily": [
     {
@@ -19,6 +19,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@DrrSultan",
+      "batch": "Med26",
+      "minutes": 46,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 49
     },
     {
       "name": "@W0M0Y",
@@ -59,6 +68,15 @@
       "xp": 427
     },
     {
+      "name": "@DrrSultan",
+      "batch": "Med26",
+      "minutes": 46,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 49
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -97,6 +115,15 @@
       "xp": 427
     },
     {
+      "name": "@DrrSultan",
+      "batch": "Med26",
+      "minutes": 46,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 49
+    },
+    {
       "name": "@Husain_Alsaati",
       "batch": "Med25",
       "minutes": 36,
@@ -133,6 +160,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "@DrrSultan",
+      "batch": "Med26",
+      "minutes": 46,
+      "founder": true,
+      "level": 1,
+      "level_title": "🥉 برونزي",
+      "xp": 49
     },
     {
       "name": "@Husain_Alsaati",
@@ -183,6 +219,15 @@
         "level": 3,
         "level_title": "🥉 برونزي",
         "xp": 427
+      },
+      {
+        "name": "@DrrSultan",
+        "batch": "Med26",
+        "minutes": 46,
+        "founder": true,
+        "level": 1,
+        "level_title": "🥉 برونزي",
+        "xp": 49
       }
     ],
     "Med27": [
@@ -199,12 +244,12 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 62.0,
+    "Med26": 65.3,
     "Med27": 0.5
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 868,
+    "Med26": 914,
     "Med27": 15
   },
   "hall_of_fame": [],
@@ -225,6 +270,11 @@
     },
     {
       "name": "Miralita",
+      "batch": "Med26",
+      "streak": 1
+    },
+    {
+      "name": "@DrrSultan",
       "batch": "Med26",
       "streak": 1
     },

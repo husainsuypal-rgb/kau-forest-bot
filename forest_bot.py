@@ -1027,6 +1027,54 @@ async def cmd_setcollegehours(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
+DONE_KEYWORDS = {"تم", "تمت", "خلص", "خلصت", "done", "Done", "DONE"}
+
+
+async def handle_session_done(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """A manager typing 'تم' (or a few variants) in the sessions topic
+    marks the most recently started, not-yet-completed study block as
+    done — editing the pinned schedule message in place with a checkmark
+    + strikethrough, rather than posting a new message each time.
+    Manager-only, and only inside the sessions topic specifically."""
+    user = update.effective_user
+    if not update.message or not update.message.text:
+        return
+    if MANAGER_IDS and user.id not in MANAGER_IDS:
+        return
+    if update.message.text.strip() not in DONE_KEYWORDS:
+        return
+    if TOPIC_SESSIONS_ID and str(getattr(update.message, "message_thread_id", "")) != str(TOPIC_SESSIONS_ID):
+        return
+
+    sched = context.application.bot_data.get("today_schedule")
+    if not sched or sched["date"] != local_today().isoformat():
+        return
+
+    now = local_now()
+    done_set = sched.setdefault("done", set())
+    candidates = [
+        (start, end) for start, end in sched["blocks"]
+        if start <= now and start.isoformat() not in done_set
+    ]
+    if not candidates:
+        return
+    start, end = max(candidates, key=lambda b: b[0])
+    done_set.add(start.isoformat())
+
+    msg_id = context.application.bot_data.get("pinned_schedule_message_id")
+    if not msg_id or not GROUP_CHAT_ID:
+        return
+    try:
+        await context.bot.edit_message_text(
+            chat_id=GROUP_CHAT_ID,
+            message_id=msg_id,
+            text=render_schedule_message(sched),
+            parse_mode="HTML",
+        )
+    except Exception:
+        logger.exception("Failed to edit the pinned schedule message after a 'done' mark")
+
+
 async def cmd_testschedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/testschedule — manager-only manual trigger for the daily study-
     block schedule, instead of waiting for the automatic 00:05 post. Does
@@ -1652,9 +1700,11 @@ async def job_daily_summary(context: ContextTypes.DEFAULT_TYPE):
 PRAYER_CITY = os.environ.get("PRAYER_CITY", "Jeddah")
 PRAYER_COUNTRY = os.environ.get("PRAYER_COUNTRY", "SaudiArabia")
 PRAYER_METHOD = 4  # Umm al-Qura University, Makkah — correct for Saudi Arabia
-PRAYER_BUFFER_BEFORE_MIN = 10  # gap before each prayer, so a block doesn't run INTO it
+PRAYER_BUFFER_BEFORE_MIN = 0  # gap starts exactly at the adhan, no early cutoff
 PRAYER_BUFFER_AFTER_MIN = 40  # gap after, enough time to actually pray before the next block
+MAGHRIB_BUFFER_AFTER_MIN = 30  # Maghrib specifically gets a shorter gap than the other prayers
 JUMUAH_BUFFER_AFTER_MIN = 75  # Friday Dhuhr = Jumu'ah: khutbah + prayer runs much longer than a normal Dhuhr
+MIN_SHORT_SESSION_MIN = 10  # leftover time shorter than this isn't worth its own session, just skip it
 STUDY_BLOCK_MIN = 60
 STUDY_BREAK_MIN = 10
 # Saudi weekend (Fri/Sat) — no college, so fewer, longer blocks instead of
@@ -1692,21 +1742,38 @@ def fetch_prayer_times(for_date: date) -> dict | None:
         return None
 
 
-def build_study_schedule(for_date: date) -> list[tuple[datetime, datetime]]:
+PRAYER_NAME_AR = {
+    "Fajr": "الفجر", "Dhuhr": "الظهر", "Asr": "العصر", "Maghrib": "المغرب", "Isha": "العشاء",
+}
+
+
+def build_study_schedule(for_date: date) -> tuple[list[tuple[datetime, datetime]], dict[int, str]]:
     """Builds the day's study-block schedule (60 min study + 10 min break,
     repeating across the full day), skipping windows around each of the 5
-    daily prayers so a block never lands mid-salah. If the prayer API is
-    unreachable, falls back to a plain back-to-back schedule with no
-    prayer gaps rather than posting nothing at all."""
+    daily prayers so a block never lands mid-salah, plus any configured
+    college hours. If the prayer API is unreachable, falls back to a plain
+    back-to-back schedule rather than posting nothing at all.
+
+    Returns (blocks, gap_labels) — gap_labels maps a block's index to the
+    reason the block before it was skipped ("صلاة الفجر", "محاضرات", etc.),
+    so the posted schedule can show WHY a gap exists instead of just a
+    silent jump in times."""
     prayers = fetch_prayer_times(for_date)
     blocked = []
     if prayers:
         is_friday = for_date.weekday() == 4
         for name, t in prayers.items():
-            after = JUMUAH_BUFFER_AFTER_MIN if (is_friday and name == "Dhuhr") else PRAYER_BUFFER_AFTER_MIN
+            if is_friday and name == "Dhuhr":
+                after = JUMUAH_BUFFER_AFTER_MIN
+            elif name == "Maghrib":
+                after = MAGHRIB_BUFFER_AFTER_MIN
+            else:
+                after = PRAYER_BUFFER_AFTER_MIN
+            label = "صلاة الجمعة" if (is_friday and name == "Dhuhr") else f"صلاة {PRAYER_NAME_AR[name]}"
             blocked.append((
                 t - timedelta(minutes=PRAYER_BUFFER_BEFORE_MIN),
                 t + timedelta(minutes=after),
+                label,
             ))
 
     college = get_college_hours(for_date.weekday())
@@ -1717,9 +1784,10 @@ def build_study_schedule(for_date: date) -> list[tuple[datetime, datetime]]:
         blocked.append((
             datetime.combine(for_date, dtime(hour=sh, minute=sm)),
             datetime.combine(for_date, dtime(hour=eh, minute=em)),
+            "محاضرات",
         ))
 
-    blocked.sort()
+    blocked.sort(key=lambda b: b[0])
 
     is_weekend = for_date.weekday() in (4, 5)  # Friday, Saturday
     block_min = WEEKEND_STUDY_BLOCK_MIN if is_weekend else STUDY_BLOCK_MIN
@@ -1729,16 +1797,62 @@ def build_study_schedule(for_date: date) -> list[tuple[datetime, datetime]]:
     day_end = datetime.combine(for_date, dtime(hour=23, minute=59))
 
     blocks = []
+    gap_labels = {}
+    pending_label = None
     cursor = day_start
-    while cursor + timedelta(minutes=block_min) <= day_end:
+    while cursor < day_end:
         block_end = cursor + timedelta(minutes=block_min)
         overlap = next((b for b in blocked if cursor < b[1] and block_end > b[0]), None)
         if overlap:
-            cursor = overlap[1]  # jump past the prayer window, try again from there
+            # A full-length block doesn't fit before this blocked window —
+            # but don't just lose whatever time IS left before it. If
+            # there's enough room for a genuinely useful shorter session,
+            # insert one instead of skipping straight to the window's end.
+            available_min = (overlap[0] - cursor).total_seconds() / 60
+            if available_min >= MIN_SHORT_SESSION_MIN:
+                if pending_label:
+                    gap_labels[len(blocks)] = pending_label
+                    pending_label = None
+                blocks.append((cursor, overlap[0]))
+            pending_label = overlap[2]
+            cursor = overlap[1]  # jump past the blocked window, continue from there
             continue
+        if block_end > day_end:
+            break
+        if pending_label:
+            gap_labels[len(blocks)] = pending_label
+            pending_label = None
         blocks.append((cursor, block_end))
         cursor = block_end + timedelta(minutes=break_min)
-    return blocks
+    return blocks, gap_labels
+
+
+def render_schedule_message(sched: dict) -> str:
+    """Builds the schedule post's text from stored state — including
+    prayer/college gap labels and any blocks a manager has marked done
+    (shown struck through with a checkmark). HTML parse mode, since
+    Telegram's legacy Markdown doesn't support strikethrough."""
+    lines = [
+        "🌲 <b>جدول المذاكرة الجماعي اليوم</b>",
+        "",
+        "أي فترة، اللي يذاكر وقتها من الأدمنز يسوي Plant Together بتطبيق Forest ويبعث رابط الانضمام هنا 🔗",
+        "",
+    ]
+    done_set = sched.get("done", set())
+    gap_labels = sched.get("gap_labels", {})
+    for i, (start, end) in enumerate(sched["blocks"]):
+        label = gap_labels.get(i)
+        if label:
+            icon = "🕌" if "صلاة" in label else "📚"
+            lines.append("")
+            lines.append(f"{icon} <i>{label}</i>")
+            lines.append("")
+        line = f"⏰ {start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')}"
+        if start.isoformat() in done_set:
+            lines.append(f"✅ <s>{line}</s>")
+        else:
+            lines.append(line)
+    return "\n".join(lines)
 
 
 STREAK_BREAK_THRESHOLD = 7  # only nudge for a streak that was actually meaningful
@@ -1783,25 +1897,23 @@ async def job_post_daily_schedule(context: ContextTypes.DEFAULT_TYPE):
     if not GROUP_CHAT_ID:
         return
     today = local_today()
-    blocks = build_study_schedule(today)
-    context.application.bot_data["today_schedule"] = {
+    blocks, gap_labels = build_study_schedule(today)
+    sched = {
         "date": today.isoformat(),
         "blocks": blocks,
+        "gap_labels": gap_labels,
         "pinged": set(),
+        "done": set(),
     }
+    context.application.bot_data["today_schedule"] = sched
     if not blocks:
         return
 
-    lines = [
-        "🌲 *جدول المذاكرة الجماعي اليوم*",
-        "",
-        "أي فترة، اللي يذاكر وقتها من الأدمنز يسوي Plant Together بتطبيق Forest ويبعث رابط الانضمام هنا 🔗",
-        "",
-    ]
-    for start, end in blocks:
-        lines.append(f"⏰ {start.strftime('%I:%M %p')} – {end.strftime('%I:%M %p')}")
     msg = await context.bot.send_message(
-        chat_id=GROUP_CHAT_ID, text="\n".join(lines), parse_mode="Markdown", **_topic_kwargs(TOPIC_SESSIONS_ID)
+        chat_id=GROUP_CHAT_ID,
+        text=render_schedule_message(sched),
+        parse_mode="HTML",
+        **_topic_kwargs(TOPIC_SESSIONS_ID),
     )
 
     # Pin it so it stays easy to find all day instead of getting buried.
@@ -2021,6 +2133,7 @@ def main():
     app.add_handler(CommandHandler("nextsession", cmd_nextsession))
     app.add_handler(CommandHandler("leaderboard", cmd_leaderboard))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_session_done))
     app.add_handler(CallbackQueryHandler(handle_callback))
 
     # Schedule automated posts (times are local per TZ_OFFSET_HOURS, expressed as UTC here)

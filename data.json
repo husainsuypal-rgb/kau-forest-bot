@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:21:38.700992",
+  "generated_at": "2026-10-03T15:21:44.686710",
   "exam_mode": false,
   "daily": [
     {
@@ -28,6 +28,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "rania☝🏻",
+      "batch": "Med26",
+      "minutes": 420,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
     },
     {
       "name": "Yara",
@@ -104,6 +113,15 @@
       "xp": 427
     },
     {
+      "name": "rania☝🏻",
+      "batch": "Med26",
+      "minutes": 420,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -178,6 +196,15 @@
       "xp": 427
     },
     {
+      "name": "rania☝🏻",
+      "batch": "Med26",
+      "minutes": 420,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
+    },
+    {
       "name": "Yara",
       "batch": "Med26",
       "minutes": 180,
@@ -250,6 +277,15 @@
       "level": 3,
       "level_title": "🥉 برونزي",
       "xp": 427
+    },
+    {
+      "name": "rania☝🏻",
+      "batch": "Med26",
+      "minutes": 420,
+      "founder": false,
+      "level": 3,
+      "level_title": "🥉 برونزي",
+      "xp": 423
     },
     {
       "name": "Yara",
@@ -329,6 +365,15 @@
         "xp": 427
       },
       {
+        "name": "rania☝🏻",
+        "batch": "Med26",
+        "minutes": 420,
+        "founder": false,
+        "level": 3,
+        "level_title": "🥉 برونزي",
+        "xp": 423
+      },
+      {
         "name": "Yara",
         "batch": "Med26",
         "minutes": 180,
@@ -379,12 +424,12 @@
   },
   "weekly_batch_averages": {
     "Med25": 12.0,
-    "Med26": 60.8,
+    "Med26": 84.1,
     "Med27": 22.7
   },
   "weekly_batch_totals": {
     "Med25": 36,
-    "Med26": 1094,
+    "Med26": 1514,
     "Med27": 657
   },
   "hall_of_fame": [],
@@ -400,6 +445,11 @@
     },
     {
       "name": "Yara",
+      "batch": "Med26",
+      "streak": 1
+    },
+    {
+      "name": "rania☝🏻",
       "batch": "Med26",
       "streak": 1
     },
@@ -426,11 +476,6 @@
     {
       "name": "Julia",
       "batch": "Med26",
-      "streak": 1
-    },
-    {
-      "name": "La goat 👨‍⚕️",
-      "batch": "Med27",
       "streak": 1
     }
   ]
